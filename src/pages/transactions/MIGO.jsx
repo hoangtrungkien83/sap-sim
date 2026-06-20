@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSapStore } from '../../store/sapStore';
+import Breadcrumb from '../../components/Breadcrumb';
 
 export default function MIGO() {
   const navigate = useNavigate();
@@ -37,6 +38,7 @@ export default function MIGO() {
   if (openPOs.length === 0 && !posted) {
     return (
       <div className="max-w-2xl">
+        <Breadcrumb crumbs={[{ label: 'Procurement', path: '/procurement' }, { label: 'MIGO — Post Goods Receipt' }]} />
         <div className="flex items-center gap-2 mb-4">
           <i className="ti ti-truck-delivery text-xl text-[var(--fiori-link)]" aria-hidden="true" />
           <h1 className="text-lg font-medium">MIGO — Post Goods Receipt</h1>
@@ -58,6 +60,7 @@ export default function MIGO() {
 
   return (
     <div className="max-w-2xl">
+      <Breadcrumb crumbs={[{ label: 'Procurement', path: '/procurement' }, { label: 'MIGO — Post Goods Receipt' }]} />
       <div className="flex items-center gap-2 mb-4">
         <i className="ti ti-truck-delivery text-xl text-[var(--fiori-link)]" aria-hidden="true" />
         <h1 className="text-lg font-medium">MIGO — Post Goods Receipt</h1>

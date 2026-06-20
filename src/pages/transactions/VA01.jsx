@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSapStore } from '../../store/sapStore';
+import Breadcrumb from '../../components/Breadcrumb';
 
 export default function VA01() {
   const navigate = useNavigate();
@@ -34,6 +35,7 @@ export default function VA01() {
 
   return (
     <div className="max-w-2xl">
+      <Breadcrumb crumbs={[{ label: 'Sales', path: '/sales' }, { label: 'VA01 — Create Sales Order' }]} />
       <div className="flex items-center gap-2 mb-4">
         <i className="ti ti-shopping-cart-plus text-xl text-[var(--fiori-link)]" aria-hidden="true" />
         <h1 className="text-lg font-medium">VA01 — Create Sales Order</h1>
@@ -76,9 +78,21 @@ export default function VA01() {
             </p>
           )}
           <div className="flex gap-2 mt-4">
+            {created.status === 'Confirmed' && (
+              <button
+                onClick={() => navigate(`/transaction/VF01?soId=${created.id}`)}
+                className="bg-[var(--fiori-link)] text-white text-sm px-3 py-1.5 rounded hover:opacity-90"
+              >
+                Tiếp tục: Create Billing Document (VF01)
+              </button>
+            )}
             <button
               onClick={() => navigate('/list/salesOrders')}
-              className="bg-[var(--fiori-link)] text-white text-sm px-3 py-1.5 rounded hover:opacity-90"
+              className={
+                created.status === 'Confirmed'
+                  ? 'border border-[var(--fiori-tile-border)] text-sm px-3 py-1.5 rounded hover:bg-gray-50'
+                  : 'bg-[var(--fiori-link)] text-white text-sm px-3 py-1.5 rounded hover:opacity-90'
+              }
             >
               Xem danh sách Sales Order
             </button>

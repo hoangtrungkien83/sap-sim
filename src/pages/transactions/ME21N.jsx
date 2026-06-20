@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSapStore } from '../../store/sapStore';
+import Breadcrumb from '../../components/Breadcrumb';
 
 export default function ME21N() {
   const navigate = useNavigate();
@@ -30,6 +31,7 @@ export default function ME21N() {
 
   return (
     <div className="max-w-2xl">
+      <Breadcrumb crumbs={[{ label: 'Procurement', path: '/procurement' }, { label: 'ME21N — Create Purchase Order' }]} />
       <div className="flex items-center gap-2 mb-4">
         <i className="ti ti-clipboard-list text-xl text-[var(--fiori-link)]" aria-hidden="true" />
         <h1 className="text-lg font-medium">ME21N — Create Purchase Order</h1>

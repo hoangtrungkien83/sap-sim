@@ -2,16 +2,28 @@ import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { NAV_TABS } from '../data/launchpadData';
 import AllMyAppsPanel from './AllMyAppsPanel';
+import SearchBar from './SearchBar';
+import NotificationPanel from './NotificationPanel';
 
 export default function FioriShell({ children }) {
   const location = useLocation();
   const [appsOpen, setAppsOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   return (
     <div className="min-h-screen flex flex-col bg-[var(--fiori-page-bg)]">
       {/* Top dark bar */}
-      <header className="bg-[var(--fiori-shell-bg)] text-white h-12 flex items-center px-3 gap-4 shrink-0">
-        <button className="p-2 hover:bg-white/10 rounded" aria-label="Menu">
+      <header className="bg-[var(--fiori-shell-bg)] text-white h-12 flex items-center px-3 gap-2 sm:gap-4 shrink-0">
+        <button
+          className="p-2 hover:bg-white/10 rounded sm:hidden"
+          aria-label="Menu"
+          onClick={() => setMobileNavOpen((v) => !v)}
+        >
+          <i className="ti ti-menu-2 text-lg" aria-hidden="true" />
+        </button>
+        <button className="p-2 hover:bg-white/10 rounded hidden sm:block" aria-label="Menu">
           <i className="ti ti-menu-2 text-lg" aria-hidden="true" />
         </button>
         <div className="flex items-center gap-2 font-semibold tracking-wide">
@@ -19,34 +31,49 @@ export default function FioriShell({ children }) {
         </div>
         <button
           onClick={() => setAppsOpen(true)}
-          className="flex items-center gap-1 ml-1 cursor-pointer hover:bg-white/10 rounded px-2 py-1"
+          className="hidden sm:flex items-center gap-1 ml-1 cursor-pointer hover:bg-white/10 rounded px-2 py-1"
         >
           <span className="text-sm">Home</span>
           <i className="ti ti-chevron-down text-xs" aria-hidden="true" />
         </button>
         <div className="flex-1" />
-        <button className="p-2 hover:bg-white/10 rounded" aria-label="Search">
+        <button
+          className="p-2 hover:bg-white/10 rounded"
+          aria-label="Search"
+          onClick={() => setSearchOpen(true)}
+        >
           <i className="ti ti-search text-lg" aria-hidden="true" />
         </button>
-        <button className="p-2 hover:bg-white/10 rounded" aria-label="Notifications">
+        <button
+          className="p-2 hover:bg-white/10 rounded relative"
+          aria-label="Notifications"
+          onClick={() => setNotifOpen((v) => !v)}
+        >
           <i className="ti ti-bell text-lg" aria-hidden="true" />
         </button>
-        <button className="p-2 hover:bg-white/10 rounded" aria-label="Favorites">
+        <button className="p-2 hover:bg-white/10 rounded hidden sm:block" aria-label="Favorites">
           <i className="ti ti-heart text-lg" aria-hidden="true" />
         </button>
-        <button className="p-2 hover:bg-white/10 rounded" aria-label="Help">
+        <button className="p-2 hover:bg-white/10 rounded hidden sm:block" aria-label="Help">
           <i className="ti ti-help text-lg" aria-hidden="true" />
         </button>
         <button
-          className="w-7 h-7 rounded-full bg-blue-400 flex items-center justify-center text-xs font-medium ml-1"
+          onClick={() => setAppsOpen(true)}
+          className="w-7 h-7 rounded-full bg-blue-400 flex items-center justify-center text-xs font-medium ml-1 sm:hidden"
+          aria-label="All My Apps"
+        >
+          <i className="ti ti-grid-dots text-base" aria-hidden="true" />
+        </button>
+        <button
+          className="w-7 h-7 rounded-full bg-blue-400 flex items-center justify-center text-xs font-medium ml-1 hidden sm:flex"
           aria-label="User"
         >
           <i className="ti ti-user text-base" aria-hidden="true" />
         </button>
       </header>
 
-      {/* Nav tabs bar */}
-      <nav className="bg-white border-b border-[var(--fiori-nav-border)] h-10 flex items-center px-3 gap-5 shrink-0 overflow-x-auto">
+      {/* Nav tabs bar — desktop */}
+      <nav className="hidden sm:flex bg-white border-b border-[var(--fiori-nav-border)] h-10 items-center px-3 gap-5 shrink-0 overflow-x-auto">
         {NAV_TABS.map((tab) => {
           const active = location.pathname === tab.path;
           return (
@@ -65,10 +92,33 @@ export default function FioriShell({ children }) {
         })}
       </nav>
 
+      {/* Nav tabs — mobile dropdown */}
+      {mobileNavOpen && (
+        <nav className="sm:hidden bg-white border-b border-[var(--fiori-nav-border)] flex flex-col shrink-0">
+          {NAV_TABS.map((tab) => {
+            const active = location.pathname === tab.path;
+            return (
+              <Link
+                key={tab.key}
+                to={tab.path}
+                onClick={() => setMobileNavOpen(false)}
+                className={`text-sm px-4 py-3 border-b border-[var(--fiori-nav-border)] last:border-0 ${
+                  active ? 'text-[var(--fiori-nav-active)] font-medium bg-[var(--fiori-page-bg)]' : 'text-[var(--fiori-text-secondary)]'
+                }`}
+              >
+                {tab.label}
+              </Link>
+            );
+          })}
+        </nav>
+      )}
+
       {/* Page content */}
-      <main className="flex-1 px-6 py-5 max-w-[1400px] w-full mx-auto">{children}</main>
+      <main className="flex-1 px-3 sm:px-6 py-5 max-w-[1400px] w-full mx-auto">{children}</main>
 
       <AllMyAppsPanel open={appsOpen} onClose={() => setAppsOpen(false)} />
+      <SearchBar open={searchOpen} onClose={() => setSearchOpen(false)} />
+      <NotificationPanel open={notifOpen} onClose={() => setNotifOpen(false)} />
     </div>
   );
 }

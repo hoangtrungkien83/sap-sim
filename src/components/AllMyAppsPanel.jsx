@@ -6,9 +6,8 @@ const APP_GROUPS = [
   {
     group: 'Accounts Payable',
     apps: [
-      { name: 'Accounts Payable - Analytics', path: '/finance' },
-      { name: 'Accounts Payable - Document Display', path: '/finance' },
-      { name: 'Accounts Payable - Operational Processing', path: '/finance' },
+      { name: 'Accounts Payable Overview', path: '/app/ap-overview' },
+      { name: 'Manage Payment Blocks', path: '/app/payment-blocks' },
       { name: 'Accounts Payable - Supplier Invoice Parking', path: '/transaction/MIRO' },
       { name: 'Accounts Payable - Supplier Invoices', path: '/list/invoices' },
     ],
@@ -16,37 +15,45 @@ const APP_GROUPS = [
   {
     group: 'Accounts Receivable',
     apps: [
-      { name: 'Accounts Receivable - Analytics', path: '/finance' },
-      { name: 'Accounts Receivable - Collections', path: '/finance' },
-      { name: 'Accounts Receivable - Dispute Resolution', path: '/finance' },
-      { name: 'Accounts Receivable - Document Display', path: '/finance' },
+      { name: 'Manage Customer Line Items', path: '/app/customer-line-items' },
+      { name: 'Process Receivables', path: '/list/billing' },
+      { name: 'Display Line Items in General Ledger', path: '/app/gl-line-items' },
     ],
   },
   {
     group: 'Procurement',
     apps: [
-      { name: 'Procurement - Purchase Orders', path: '/transaction/ME21N' },
-      { name: 'Procurement - Goods Receipt', path: '/transaction/MIGO' },
-      { name: 'Procurement - Supplier List', path: '/list/vendors' },
-      { name: 'Procurement - Contract Management', path: '/procurement' },
+      { name: 'Manage Purchase Orders (ME21N)', path: '/transaction/ME21N' },
+      { name: 'Post Goods Receipt (MIGO)', path: '/transaction/MIGO' },
+      { name: 'Display Supplier List', path: '/list/vendors' },
+      { name: 'Enterprise Contract Management', path: '/app/legal-contracts' },
+      { name: 'Display Supplier Balances', path: '/app/supplier-balances' },
     ],
   },
   {
     group: 'Sales',
     apps: [
-      { name: 'Sales - Create Sales Order', path: '/transaction/VA01' },
-      { name: 'Sales - Order List', path: '/list/salesOrders' },
-      { name: 'Sales - Billing Documents', path: '/sales' },
+      { name: 'Create Sales Order (VA01)', path: '/transaction/VA01' },
+      { name: 'Sales Order List', path: '/list/salesOrders' },
+      { name: 'Create Billing Documents (VF01)', path: '/transaction/VF01' },
+      { name: 'Billing Documents List', path: '/list/billing' },
+      { name: 'Top Customers', path: '/app/top-customers' },
     ],
   },
   {
     group: 'Manufacturing & Supply Chain',
     apps: [
-      { name: 'EAM - Maintenance Job Lists', path: '/manufacturing' },
-      { name: 'EAM - Maintenance Orders Display', path: '/manufacturing' },
-      { name: 'EAM - Maintenance Orders Management', path: '/manufacturing' },
-      { name: 'EAM - Maintenance Request', path: '/manufacturing' },
-      { name: 'QM - Inspection Lots', path: '/manufacturing' },
+      { name: 'EAM - Maintenance Requests', path: '/app/maintenance-requests' },
+      { name: 'QM - Inspection Lots', path: '/app/inspection-lots' },
+      { name: 'QM - Quality Overview', path: '/app/quality-overview' },
+    ],
+  },
+  {
+    group: 'Project Management',
+    apps: [
+      { name: 'Manage Projects', path: '/app/projects' },
+      { name: 'Manage Project Budget', path: '/app/project-budget' },
+      { name: 'Track Milestones', path: '/app/milestones' },
     ],
   },
   {

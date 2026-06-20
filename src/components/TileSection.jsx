@@ -28,7 +28,18 @@ export default function TileSection({ section }) {
                 value={tile.value}
                 sub={tile.sub}
                 icon={tile.icon}
-                onClick={() => {}}
+                onClick={() => navigate(`/app/${tile.app}`)}
+              />
+            );
+          }
+          if (tile.type === 'app') {
+            return (
+              <NavTile
+                key={tile.id}
+                title={tile.title}
+                subtitle={tile.subtitle}
+                icon={tile.icon}
+                onClick={() => navigate(`/app/${tile.app}`)}
               />
             );
           }

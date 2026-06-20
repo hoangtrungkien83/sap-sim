@@ -10,6 +10,7 @@ import { persist } from 'zustand/middleware';
 let nextPoNumber = 4500017001;
 let nextInvoiceNumber = 5105601234;
 let nextSoNumber = 30001234;
+let nextBillingNumber = 90035001;
 
 const initialVendors = [
   { id: 'V1001', name: 'Công ty TNHH Thép Hòa Phát', country: 'VN', currency: 'VND' },
@@ -47,6 +48,7 @@ export const useSapStore = create(
     { materialId: 'M-2003', plant: '1010', qty: 1200, unit: 'EA' },
   ],
   salesOrders: [],
+  billingDocuments: [],
   financeDocuments: [],
 
   // KPI cache hiển thị trên tile (giống ảnh My Home / Finance)
@@ -221,11 +223,83 @@ export const useSapStore = create(
     return so;
   },
 
+  // ── VF01: Create Billing Document from a confirmed Sales Order ──
+  createBillingDocument: ({ soId }) => {
+    const so = get().salesOrders.find((s) => s.id === soId);
+    if (!so) return null;
+    if (so.status !== 'Confirmed') return null;
+
+    const billing = {
+      id: String(nextBillingNumber++),
+      soId,
+      customerId: so.customerId,
+      customerName: so.customerName,
+      materialName: so.materialName,
+      quantity: so.quantity,
+      unit: so.unit,
+      netValue: so.netValue,
+      currency: 'VND',
+      status: 'Posted',
+      postedAt: new Date().toISOString(),
+    };
+
+    const fiDoc = {
+      id: 'FI-' + Date.now(),
+      type: 'Customer Invoice',
+      reference: billing.id,
+      vendorName: so.customerName,
+      amount: so.netValue,
+      postedAt: new Date().toISOString(),
+    };
+
+    set((state) => ({
+      billingDocuments: [billing, ...state.billingDocuments],
+      financeDocuments: [fiDoc, ...state.financeDocuments],
+      salesOrders: state.salesOrders.map((s) => (s.id === soId ? { ...s, status: 'Billed' } : s)),
+    }));
+    return billing;
+  },
+
+  // ── Document Flow: truy vết toàn bộ chứng từ liên quan tới 1 PO ──
+  // (giống tab "Document Flow" trong ME23N/PO Detail của SAP thật)
+  getPoDocumentFlow: (poId) => {
+    const state = get();
+    const po = state.purchaseOrders.find((p) => p.id === poId);
+    if (!po) return [];
+    const flow = [{ type: 'Purchase Order', id: po.id, status: po.status, date: po.createdAt }];
+    state.goodsReceipts
+      .filter((gr) => gr.poId === poId)
+      .forEach((gr) => flow.push({ type: 'Goods Receipt', id: gr.id, status: 'Posted', date: gr.postedAt }));
+    state.supplierInvoices
+      .filter((inv) => inv.poId === poId)
+      .forEach((inv) => flow.push({ type: 'Supplier Invoice', id: inv.id, status: inv.status, date: inv.postedAt }));
+    state.financeDocuments
+      .filter((fi) => state.supplierInvoices.some((inv) => inv.poId === poId && inv.id === fi.reference))
+      .forEach((fi) => flow.push({ type: 'FI Document', id: fi.id, status: 'Posted', date: fi.postedAt }));
+    return flow.sort((a, b) => new Date(a.date) - new Date(b.date));
+  },
+
+  // ── Document Flow cho Sales Order (SO → Billing → FI) ──
+  getSoDocumentFlow: (soId) => {
+    const state = get();
+    const so = state.salesOrders.find((s) => s.id === soId);
+    if (!so) return [];
+    const flow = [{ type: 'Sales Order', id: so.id, status: so.status, date: so.createdAt }];
+    state.billingDocuments
+      .filter((b) => b.soId === soId)
+      .forEach((b) => flow.push({ type: 'Billing Document', id: b.id, status: b.status, date: b.postedAt }));
+    state.financeDocuments
+      .filter((fi) => state.billingDocuments.some((b) => b.soId === soId && b.id === fi.reference))
+      .forEach((fi) => flow.push({ type: 'FI Document', id: fi.id, status: 'Posted', date: fi.postedAt }));
+    return flow.sort((a, b) => new Date(a.date) - new Date(b.date));
+  },
+
   // ── Reset toàn bộ dữ liệu demo về trạng thái ban đầu ──
   resetStore: () => {
     nextPoNumber = 4500017001;
     nextInvoiceNumber = 5105601234;
     nextSoNumber = 30001234;
+    nextBillingNumber = 90035001;
     set({
       vendors: initialVendors,
       customers: initialCustomers,
@@ -239,6 +313,7 @@ export const useSapStore = create(
         { materialId: 'M-2003', plant: '1010', qty: 1200, unit: 'EA' },
       ],
       salesOrders: [],
+      billingDocuments: [],
       financeDocuments: [],
     });
   },
