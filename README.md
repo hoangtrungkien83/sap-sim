@@ -60,4 +60,3 @@ npm run build
 - [ ] Search bar hoạt động thật (tìm app/tile theo tên)
 - [ ] Notification bell có nội dung (vd: "PO vượt ngân sách", "SO backorder")
 - [ ] Responsive mobile layout cho nav tabs (hiện đã overflow-x-auto cơ bản)
-# sap-sim
