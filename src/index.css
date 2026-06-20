@@ -1,0 +1,36 @@
+@import url('https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css');
+@import "tailwindcss";
+
+:root {
+  /* Fiori-inspired tokens */
+  --fiori-shell-bg: #354a5f;
+  --fiori-shell-text: #ffffff;
+  --fiori-nav-bg: #ffffff;
+  --fiori-nav-border: #e5e5e5;
+  --fiori-nav-active: #0a6ed1;
+  --fiori-page-bg: #f5f6f7;
+  --fiori-tile-bg: #ffffff;
+  --fiori-tile-border: #e5e5e5;
+  --fiori-text-primary: #1d2d3e;
+  --fiori-text-secondary: #6a6d70;
+  --fiori-link: #0a6ed1;
+  --fiori-danger: #bb0000;
+  --fiori-success: #107e3e;
+  --fiori-warning: #df6e0c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: '72', "Segoe UI", Arial, sans-serif;
+  background: var(--fiori-page-bg);
+  color: var(--fiori-text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+}
