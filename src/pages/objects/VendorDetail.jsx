@@ -4,10 +4,13 @@ import ObjectPage, { ObjectSection } from '../../components/ObjectPage';
 import DataTable from '../../components/DataTable';
 import StatusBadge from '../../components/StatusBadge';
 import Breadcrumb from '../../components/Breadcrumb';
+import { useT } from '../../hooks/useT';
 
 export default function VendorDetail() {
   const { vendorId } = useParams();
   const navigate = useNavigate();
+  const { t, lang } = useT();
+  const isVi = lang === 'vi';
   const vendor = useSapStore((s) => s.vendors.find((v) => v.id === vendorId));
   const purchaseOrders = useSapStore((s) => s.purchaseOrders.filter((p) => p.vendorId === vendorId));
   const invoices = useSapStore((s) => s.supplierInvoices.filter((i) => i.vendorId === vendorId));
@@ -15,7 +18,7 @@ export default function VendorDetail() {
   if (!vendor) {
     return (
       <div className="text-sm text-[var(--fiori-text-secondary)]">
-        Không tìm thấy nhà cung cấp <code>{vendorId}</code>.
+        {t('obj_not_found_vendor')} <code>{vendorId}</code>.
       </div>
     );
   }
@@ -27,65 +30,66 @@ export default function VendorDetail() {
     <div>
       <Breadcrumb
         crumbs={[
-          { label: 'Procurement', path: '/procurement' },
-          { label: 'Suppliers', path: '/list/vendors' },
+          { label: t('nav_procurement'), path: '/procurement' },
+          { label: isVi ? 'Nhà cung cấp' : 'Suppliers', path: '/list/vendors' },
           { label: vendor.name },
         ]}
       />
       <ObjectPage
         title={vendor.name}
-        subtitle={`Vendor ${vendor.id} · ${vendor.country}`}
+        subtitle={`${isVi ? 'Nhà cung cấp' : 'Vendor'} ${vendor.id} · ${vendor.country}`}
         keyFacts={[
-          { label: 'Currency', value: vendor.currency },
-          { label: 'Purchase Orders', value: purchaseOrders.length },
-          { label: 'Total PO Value', value: `${totalPoValue.toLocaleString('vi-VN')} VND` },
-          { label: 'Total Invoiced', value: `${totalInvoiced.toLocaleString('vi-VN')} VND` },
+          { label: isVi ? 'Tiền tệ' : 'Currency', value: vendor.currency },
+          { label: isVi ? 'Danh mục' : 'Category', value: vendor.category?.[lang] ?? vendor.category?.vi ?? '—' },
+          { label: isVi ? 'Số đơn đặt hàng' : 'Purchase Orders', value: purchaseOrders.length },
+          { label: isVi ? 'Tổng giá trị PO' : 'Total PO Value', value: `${totalPoValue.toLocaleString('vi-VN')} VND` },
+          { label: isVi ? 'Tổng đã ghi nhận' : 'Total Invoiced', value: `${totalInvoiced.toLocaleString('vi-VN')} VND` },
         ]}
         actions={[
           {
-            label: 'Tạo Purchase Order',
+            label: t('btn_create_po'),
             icon: 'ti-clipboard-list',
             primary: true,
             onClick: () => navigate('/transaction/ME21N'),
           },
         ]}
       >
-        <ObjectSection title="Purchase Orders">
+        <ObjectSection title={isVi ? 'Đơn đặt hàng' : 'Purchase Orders'}>
           <DataTable
             columns={[
-              { key: 'id', label: 'PO Number', sortable: true },
-              { key: 'materialName', label: 'Material', sortable: true },
+              { key: 'id', label: isVi ? 'Số PO' : 'PO Number', sortable: true },
+              { key: 'materialName', label: isVi ? 'Vật tư' : 'Material', sortable: true },
               {
                 key: 'netValue',
-                label: 'Net Value',
+                label: isVi ? 'Giá trị' : 'Net Value',
                 sortable: true,
                 render: (r) => `${r.netValue.toLocaleString('vi-VN')} VND`,
               },
-              { key: 'status', label: 'Status', render: (r) => <StatusBadge status={r.status} /> },
+              { key: 'status', label: isVi ? 'Trạng thái' : 'Status', render: (r) => <StatusBadge status={r.status} /> },
             ]}
             rows={purchaseOrders}
             onRowClick={(row) => navigate(`/object/po/${row.id}`)}
-            searchPlaceholder="Tìm PO..."
-            emptyText="Chưa có Purchase Order nào với nhà cung cấp này."
+            searchPlaceholder={isVi ? 'Tìm PO...' : 'Search PO...'}
+            emptyText={isVi ? 'Chưa có Purchase Order nào với nhà cung cấp này.' : 'No Purchase Orders for this vendor yet.'}
           />
         </ObjectSection>
 
-        <ObjectSection title="Invoices">
+        <ObjectSection title={isVi ? 'Hóa đơn' : 'Invoices'}>
           <DataTable
             columns={[
-              { key: 'id', label: 'Invoice', sortable: true },
+              { key: 'id', label: isVi ? 'Hóa đơn' : 'Invoice', sortable: true },
               {
                 key: 'amount',
-                label: 'Amount',
+                label: isVi ? 'Số tiền' : 'Amount',
                 sortable: true,
                 render: (r) => `${r.amount.toLocaleString('vi-VN')} ${r.currency}`,
               },
-              { key: 'status', label: 'Status', render: (r) => <StatusBadge status={r.status} /> },
+              { key: 'status', label: isVi ? 'Trạng thái' : 'Status', render: (r) => <StatusBadge status={r.status} /> },
             ]}
             rows={invoices}
             onRowClick={(row) => navigate(`/object/invoice/${row.id}`)}
-            searchPlaceholder="Tìm hóa đơn..."
-            emptyText="Chưa có hóa đơn nào với nhà cung cấp này."
+            searchPlaceholder={isVi ? 'Tìm hóa đơn...' : 'Search invoices...'}
+            emptyText={isVi ? 'Chưa có hóa đơn nào với nhà cung cấp này.' : 'No invoices for this vendor yet.'}
           />
         </ObjectSection>
       </ObjectPage>

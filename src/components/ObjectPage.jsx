@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { useT } from '../hooks/useT';
 
 /**
  * ObjectPage: khung trang chi tiết kiểu Fiori Object Page.
@@ -12,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
  */
 export default function ObjectPage({ title, subtitle, status, keyFacts = [], actions = [], children }) {
   const navigate = useNavigate();
+  const { t } = useT();
 
   return (
     <div>
@@ -20,7 +22,7 @@ export default function ObjectPage({ title, subtitle, status, keyFacts = [], act
         className="flex items-center gap-1 text-sm text-[var(--fiori-text-secondary)] hover:text-[var(--fiori-text-primary)] mb-2"
       >
         <i className="ti ti-arrow-left text-base" aria-hidden="true" />
-        Back
+        {t('btn_back')}
       </button>
 
       <div className="bg-white border border-[var(--fiori-tile-border)] rounded-lg p-5 mb-5">

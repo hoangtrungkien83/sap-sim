@@ -52,6 +52,69 @@ npm run build
 - Bấm icon chuông → xem thông báo thật được tạo từ dữ liệu hiện có (PO mới, SO backorder, tồn kho thấp).
 - Bấm "Home" (desktop) hoặc icon lưới (mobile) → mở All My Apps, duyệt theo nhóm module.
 
+## Sửa lỗi sau đánh giá độc lập (Audit Fixes)
+
+Sau một vòng đánh giá khách quan (đóng vai reviewer logic/nghiệp vụ), 7 vấn đề sau
+đã được khắc phục:
+
+**Nghiêm trọng:**
+1. **Backorder tự động Confirmed** — `postGoodsReceipt` giờ quét lại mọi SO đang
+   Backorder cùng material/plant theo thứ tự FIFO, tự xác nhận khi đủ kho. UI hiển
+   thị rõ "X Sales Order đã tự động chuyển sang Confirmed" ngay sau khi MIGO, kèm
+   notification tương ứng — không còn lời hứa suông.
+2. **KPI tính động từ dữ liệu thật** — bỏ hoàn toàn số liệu tĩnh "40.64M EUR" sai đơn
+   vị. `getKpis()` giờ tính trực tiếp từ `supplierInvoices`/`billingDocuments` thật,
+   luôn nhất quán với bảng chi tiết, đơn vị VND xuyên suốt.
+3. **MIRO áp dụng 3-way match** — chặn xuất hóa đơn vượt giá trị hàng đã nhận theo
+   PO, hiển thị rõ "Tối đa có thể xuất" và validate trước khi submit.
+4. **Gross Margin dùng giá vốn thật** — mỗi material có `costPrice` riêng phản ánh
+   biên lợi nhuận thực tế theo ngành hàng, thay vì giả định cứng 70% cho mọi vật tư.
+
+**Trung bình:**
+5. **StatusBadge dịch theo ngôn ngữ** — mọi nhãn trạng thái (Open, Confirmed,
+   Backorder...) giờ hiển thị đúng tiếng Việt/Anh theo lựa chọn, nhất quán với
+   phần còn lại của UI.
+6. **DataTable responsive thật trên mobile** — chuyển sang dạng card-list dọc trên
+   màn hình nhỏ (`sm:hidden`) thay vì chỉ cuộn ngang một bảng nhiều cột.
+7. **Approval Workflow (release strategy)** — PO trên 500 triệu VND vào trạng thái
+   "Pending Approval", cần phê duyệt thủ công ở Object Page trước khi có thể nhận
+   hàng (MIGO) hoặc xuất hóa đơn (MIRO). Có sẵn 1 PO seed minh họa tính năng này.
+
+## Đa ngôn ngữ (Tiếng Việt / English)
+
+Toàn bộ UI hỗ trợ chuyển đổi Anh/Việt theo thời gian thực — bấm nút **VI/EN** ở góc
+trên bên phải thanh top bar. Bao gồm:
+- Nav tabs, Pages cards, section title, tile title trên mọi module
+- Toàn bộ form giao dịch (ME21N, MIGO, MIRO, VA01, VF01)
+- Object Page (header, key facts, action button, Document Flow)
+- DataTable (search placeholder, cột, trạng thái), breadcrumb, notification, search,
+  All My Apps panel
+
+Lựa chọn ngôn ngữ được lưu qua `localStorage` (Zustand `persist`, key `sap-sim-lang`),
+giữ nguyên khi reload trang. Dữ liệu giao dịch (PO, SO, hóa đơn...) snapshot tên vật tư
+bằng tiếng Việt tại thời điểm tạo — đúng hành vi document trong SAP thật không tự đổi
+ngôn ngữ sau khi đã post.
+
+## Master Data mở rộng + Seed Data
+
+- **12 vendor**, **10 customer**, **10 material** đa dạng ngành nghề (thép, logistics,
+  điện tử, hóa chất, bao bì, xây dựng...) thay vì chỉ 3 dòng như bản đầu.
+- App khởi động **đã có sẵn lịch sử giao dịch**: 6 Purchase Order, 4 Goods Receipt,
+  4 Supplier Invoice, 5 Sales Order (đủ trạng thái Open/Delivered/Partially
+  Delivered/Confirmed/Backorder/Billed), 2 Billing Document — toàn bộ Document Flow
+  hiển thị đúng ngay từ lần mở đầu tiên, không cần tự tạo giao dịch để thấy dữ liệu.
+- Material/Vendor giờ phân bổ theo 2 Plant (1010 — Bắc Ninh, 1020 — Đà Nẵng), VA01 tự
+  tra đúng plant theo material thay vì hardcode 1010.
+
+## Liên kết module chặt chẽ hơn
+
+- Thêm **Customer Object Page** (`/object/customer/:id`) — đối xứng với Vendor Object
+  Page, hiển thị toàn bộ Sales Order + Billing Document của khách hàng đó.
+- PO Detail, Invoice Detail giờ có nút **"Xem nhà cung cấp"** dẫn sang Vendor Detail.
+- SO Detail, Billing Detail có nút **"Xem khách hàng"** dẫn sang Customer Detail.
+- "Top Customers" trong Sales Analytics giờ click được, dẫn thẳng tới Customer Detail.
+- All My Apps panel bổ sung link còn thiếu (Fulfillment Issues, Top Customers...).
+
 ## Object Page — trải nghiệm giống SAP thật
 
 Bản nâng cấp lớn nhất: mọi bảng dữ liệu (PO list, SO list, Invoice list, Billing list,

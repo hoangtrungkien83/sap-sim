@@ -2,9 +2,12 @@ import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSapStore } from '../../store/sapStore';
 import Breadcrumb from '../../components/Breadcrumb';
+import { useT } from '../../hooks/useT';
 
 export default function VF01() {
   const navigate = useNavigate();
+  const { t, lang } = useT();
+  const isVi = lang === 'vi';
   const [searchParams] = useSearchParams();
   const presetSoId = searchParams.get('soId') || '';
 
@@ -22,12 +25,16 @@ export default function VF01() {
     e.preventDefault();
     setError('');
     if (!selectedSo) {
-      setError('Vui lòng chọn Sales Order.');
+      setError(isVi ? 'Vui lòng chọn Sales Order.' : 'Please select a Sales Order.');
       return;
     }
     const billing = createBillingDocument({ soId });
     if (!billing) {
-      setError('Sales Order này không thể xuất hóa đơn (chưa Confirmed hoặc đã Billed).');
+      setError(
+        isVi
+          ? 'Sales Order này không thể xuất hóa đơn (chưa Confirmed hoặc đã Billed).'
+          : 'This Sales Order cannot be billed (not Confirmed or already Billed).'
+      );
       return;
     }
     setPosted(billing);
@@ -36,20 +43,21 @@ export default function VF01() {
   if (billableSOs.length === 0 && !posted) {
     return (
       <div className="max-w-2xl">
-        <Breadcrumb crumbs={[{ label: 'Sales', path: '/sales' }, { label: 'VF01 — Create Billing Document' }]} />
+        <Breadcrumb crumbs={[{ label: t('nav_sales'), path: '/sales' }, { label: 'VF01' }]} />
         <div className="flex items-center gap-2 mb-4">
           <i className="ti ti-receipt-2 text-xl text-[var(--fiori-link)]" aria-hidden="true" />
-          <h1 className="text-lg font-medium">VF01 — Create Billing Document</h1>
+          <h1 className="text-lg font-medium">{isVi ? 'VF01 — Tạo hóa đơn bán hàng' : 'VF01 — Create Billing Document'}</h1>
         </div>
         <div className="bg-white border border-[var(--fiori-tile-border)] rounded-lg p-5 text-sm text-[var(--fiori-text-secondary)]">
-          Chưa có Sales Order nào ở trạng thái Confirmed để xuất hóa đơn. Đơn Backorder cần đủ
-          hàng (qua MIGO) hoặc tạo SO mới với đủ tồn kho.
+          {isVi
+            ? 'Chưa có Sales Order nào ở trạng thái Confirmed để xuất hóa đơn. Đơn Backorder cần đủ hàng (qua MIGO) hoặc tạo SO mới với đủ tồn kho.'
+            : 'No Confirmed Sales Order available for billing. Backorders need stock (via MIGO) or create a new SO with enough stock.'}
           <div className="mt-3">
             <button
               onClick={() => navigate('/transaction/VA01')}
               className="bg-[var(--fiori-link)] text-white text-sm px-3 py-1.5 rounded hover:opacity-90"
             >
-              Tạo Sales Order (VA01)
+              {t('btn_create_so')}
             </button>
           </div>
         </div>
@@ -59,52 +67,56 @@ export default function VF01() {
 
   return (
     <div className="max-w-2xl">
-      <Breadcrumb crumbs={[{ label: 'Sales', path: '/sales' }, { label: 'VF01 — Create Billing Document' }]} />
+      <Breadcrumb crumbs={[{ label: t('nav_sales'), path: '/sales' }, { label: 'VF01' }]} />
       <div className="flex items-center gap-2 mb-4">
         <i className="ti ti-receipt-2 text-xl text-[var(--fiori-link)]" aria-hidden="true" />
-        <h1 className="text-lg font-medium">VF01 — Create Billing Document</h1>
+        <h1 className="text-lg font-medium">{isVi ? 'VF01 — Tạo hóa đơn bán hàng' : 'VF01 — Create Billing Document'}</h1>
       </div>
 
       {posted ? (
         <div className="bg-white border border-[var(--fiori-tile-border)] rounded-lg p-5">
           <div className="flex items-center gap-2 text-[var(--fiori-success)] mb-3">
             <i className="ti ti-circle-check text-xl" aria-hidden="true" />
-            <span className="font-medium">Đã xuất hóa đơn bán hàng</span>
+            <span className="font-medium">{isVi ? 'Đã xuất hóa đơn bán hàng' : 'Billing document posted'}</span>
           </div>
           <dl className="grid grid-cols-2 gap-y-2 text-sm">
-            <dt className="text-[var(--fiori-text-secondary)]">Billing Document</dt>
+            <dt className="text-[var(--fiori-text-secondary)]">{isVi ? 'Chứng từ hóa đơn' : 'Billing Document'}</dt>
             <dd className="font-medium">{posted.id}</dd>
-            <dt className="text-[var(--fiori-text-secondary)]">SO Reference</dt>
+            <dt className="text-[var(--fiori-text-secondary)]">{isVi ? 'Tham chiếu SO' : 'SO Reference'}</dt>
             <dd>{posted.soId}</dd>
-            <dt className="text-[var(--fiori-text-secondary)]">Customer</dt>
+            <dt className="text-[var(--fiori-text-secondary)]">{isVi ? 'Khách hàng' : 'Customer'}</dt>
             <dd>{posted.customerName}</dd>
-            <dt className="text-[var(--fiori-text-secondary)]">Material</dt>
+            <dt className="text-[var(--fiori-text-secondary)]">{isVi ? 'Vật tư' : 'Material'}</dt>
             <dd>{posted.materialName}</dd>
-            <dt className="text-[var(--fiori-text-secondary)]">Net Value</dt>
+            <dt className="text-[var(--fiori-text-secondary)]">{isVi ? 'Giá trị' : 'Net Value'}</dt>
             <dd className="font-medium">{posted.netValue.toLocaleString('vi-VN')} {posted.currency}</dd>
           </dl>
           <p className="text-xs text-[var(--fiori-text-secondary)] mt-3">
-            Bút toán FI (Customer Invoice) đã được tạo tự động — xem trong Finance &gt; Accounts Receivable.
+            {isVi
+              ? 'Bút toán FI (Customer Invoice) đã được tạo tự động — xem trong Finance > Accounts Receivable.'
+              : 'An FI document (Customer Invoice) has been auto-generated — see Finance > Accounts Receivable.'}
           </p>
           <div className="flex gap-2 mt-4">
             <button
               onClick={() => navigate('/finance')}
               className="bg-[var(--fiori-link)] text-white text-sm px-3 py-1.5 rounded hover:opacity-90"
             >
-              Xem Accounts Receivable
+              {t('btn_view_ar')}
             </button>
             <button
               onClick={() => navigate('/list/billing')}
               className="border border-[var(--fiori-tile-border)] text-sm px-3 py-1.5 rounded hover:bg-gray-50"
             >
-              Danh sách hóa đơn bán hàng
+              {t('btn_view_billing')}
             </button>
           </div>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="bg-white border border-[var(--fiori-tile-border)] rounded-lg p-5 space-y-4">
           <div>
-            <label className="block text-sm text-[var(--fiori-text-secondary)] mb-1">Sales Order (Confirmed)</label>
+            <label className="block text-sm text-[var(--fiori-text-secondary)] mb-1">
+              Sales Order ({isVi ? 'Đã xác nhận' : 'Confirmed'})
+            </label>
             <select
               value={soId}
               onChange={(e) => setSoId(e.target.value)}
@@ -121,11 +133,11 @@ export default function VF01() {
           {selectedSo && (
             <div className="bg-[var(--fiori-page-bg)] rounded p-3 text-sm space-y-1">
               <div className="flex justify-between">
-                <span className="text-[var(--fiori-text-secondary)]">Quantity</span>
+                <span className="text-[var(--fiori-text-secondary)]">{isVi ? 'Số lượng' : 'Quantity'}</span>
                 <span>{selectedSo.quantity} {selectedSo.unit}</span>
               </div>
               <div className="flex justify-between font-medium">
-                <span>Net Value sẽ xuất hóa đơn</span>
+                <span>{isVi ? 'Giá trị sẽ xuất hóa đơn' : 'Net Value to bill'}</span>
                 <span>{selectedSo.netValue.toLocaleString('vi-VN')} VND</span>
               </div>
             </div>
@@ -137,7 +149,7 @@ export default function VF01() {
             type="submit"
             className="bg-[var(--fiori-link)] text-white text-sm px-4 py-2 rounded hover:opacity-90"
           >
-            Post Billing Document
+            {isVi ? 'Ghi nhận hóa đơn' : 'Post Billing Document'}
           </button>
         </form>
       )}

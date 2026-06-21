@@ -1,5 +1,6 @@
 import { useSapStore } from '../store/sapStore';
 import { ResponsiveContainer, LineChart, Line } from 'recharts';
+import { useT } from '../hooks/useT';
 
 const toneClass = {
   danger: 'text-[var(--fiori-danger)]',
@@ -15,9 +16,17 @@ const toneStroke = {
   default: '#0a6ed1',
 };
 
-export function KpiTile({ title, subtitle, kpiKey, tone = 'default', updatedAgo = '5m ago' }) {
-  const kpi = useSapStore((s) => s.kpis[kpiKey]);
+export function KpiTile({ title, subtitle, kpiKey, tone = 'default', updatedAgo }) {
+  const { lang } = useT();
+  // Subscribe trực tiếp vào supplierInvoices/billingDocuments để component
+  // re-render đúng lúc dữ liệu nguồn đổi; getKpis() tính nhẹ (vài phép cộng
+  // trên mảng vài chục phần tử) nên gọi trực tiếp trong render là đủ rẻ,
+  // không cần memo hóa thêm.
+  useSapStore((s) => s.supplierInvoices);
+  useSapStore((s) => s.billingDocuments);
+  const kpi = useSapStore((s) => s.getKpis())[kpiKey];
   if (!kpi) return null;
+  const agoText = updatedAgo ?? (lang === 'vi' ? '5 phút trước' : '5m ago');
 
   return (
     <div className="bg-white border border-[var(--fiori-tile-border)] rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer min-h-[120px] flex flex-col justify-between">
@@ -49,7 +58,7 @@ export function KpiTile({ title, subtitle, kpiKey, tone = 'default', updatedAgo 
       </div>
       <div className="flex items-center gap-1 text-xs text-[var(--fiori-text-secondary)] mt-2">
         <i className="ti ti-refresh text-[11px]" aria-hidden="true" />
-        <span>{updatedAgo}</span>
+        <span>{agoText}</span>
       </div>
     </div>
   );

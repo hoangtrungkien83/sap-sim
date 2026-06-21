@@ -5,7 +5,7 @@ export default function FinancePage() {
   return (
     <div>
       {FINANCE_SECTIONS.map((section) => (
-        <TileSection key={section.title} section={section} />
+        <TileSection key={section.title.vi} section={section} />
       ))}
     </div>
   );

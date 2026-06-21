@@ -1,12 +1,15 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { NAV_TABS } from '../data/launchpadData';
+import { NAV_TABS, tr } from '../data/launchpadData';
 import AllMyAppsPanel from './AllMyAppsPanel';
 import SearchBar from './SearchBar';
 import NotificationPanel from './NotificationPanel';
+import LangSwitcher from './LangSwitcher';
+import { useT } from '../hooks/useT';
 
 export default function FioriShell({ children }) {
   const location = useLocation();
+  const { lang } = useT();
   const [appsOpen, setAppsOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
@@ -33,10 +36,11 @@ export default function FioriShell({ children }) {
           onClick={() => setAppsOpen(true)}
           className="hidden sm:flex items-center gap-1 ml-1 cursor-pointer hover:bg-white/10 rounded px-2 py-1"
         >
-          <span className="text-sm">Home</span>
+          <span className="text-sm">{tr(NAV_TABS[0].label, lang)}</span>
           <i className="ti ti-chevron-down text-xs" aria-hidden="true" />
         </button>
         <div className="flex-1" />
+        <LangSwitcher />
         <button
           className="p-2 hover:bg-white/10 rounded"
           aria-label="Search"
@@ -86,7 +90,7 @@ export default function FioriShell({ children }) {
                   : 'border-transparent text-[var(--fiori-text-secondary)] hover:text-[var(--fiori-text-primary)]'
               }`}
             >
-              {tab.label}
+              {tr(tab.label, lang)}
             </Link>
           );
         })}
@@ -106,7 +110,7 @@ export default function FioriShell({ children }) {
                   active ? 'text-[var(--fiori-nav-active)] font-medium bg-[var(--fiori-page-bg)]' : 'text-[var(--fiori-text-secondary)]'
                 }`}
               >
-                {tab.label}
+                {tr(tab.label, lang)}
               </Link>
             );
           })}

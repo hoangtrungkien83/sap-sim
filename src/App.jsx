@@ -9,6 +9,8 @@ import ProjectPage from './pages/ProjectPage';
 import PlaceholderPage from './pages/PlaceholderPage';
 import ListPage from './pages/ListPage';
 import AppDetailPage from './pages/AppDetailPage';
+import { useLangStore } from './store/langStore';
+import { NAV_TABS, tr } from './data/launchpadData';
 import ME21N from './pages/transactions/ME21N';
 import MIGO from './pages/transactions/MIGO';
 import MIRO from './pages/transactions/MIRO';
@@ -19,16 +21,23 @@ import SalesOrderDetail from './pages/objects/SalesOrderDetail';
 import SupplierInvoiceDetail from './pages/objects/SupplierInvoiceDetail';
 import BillingDocumentDetail from './pages/objects/BillingDocumentDetail';
 import VendorDetail from './pages/objects/VendorDetail';
+import CustomerDetail from './pages/objects/CustomerDetail';
 
 const TRANSACTIONS = { ME21N, MIGO, MIRO, VA01, VF01 };
 
 function TransactionPage() {
   const { txn } = useParams();
+  const lang = useLangStore((s) => s.lang);
   const Component = TRANSACTIONS[txn];
   if (!Component) {
-    return <PlaceholderPage name={`Transaction ${txn} chưa hỗ trợ`} />;
+    return <PlaceholderPage name={lang === 'vi' ? `Giao dịch ${txn} chưa hỗ trợ` : `Transaction ${txn} not supported`} />;
   }
   return <Component />;
+}
+
+function OtherPage() {
+  const lang = useLangStore((s) => s.lang);
+  return <PlaceholderPage name={tr(NAV_TABS[6].label, lang)} />;
 }
 
 export default function App() {
@@ -42,7 +51,7 @@ export default function App() {
           <Route path="/manufacturing" element={<ManufacturingPage />} />
           <Route path="/project" element={<ProjectPage />} />
           <Route path="/sales" element={<SalesPage />} />
-          <Route path="/other" element={<PlaceholderPage name="Other" />} />
+          <Route path="/other" element={<OtherPage />} />
           <Route path="/transaction/:txn" element={<TransactionPage />} />
           <Route path="/list/:listKey" element={<ListPage />} />
           <Route path="/app/:appKey" element={<AppDetailPage />} />
@@ -51,6 +60,7 @@ export default function App() {
           <Route path="/object/invoice/:invoiceId" element={<SupplierInvoiceDetail />} />
           <Route path="/object/billing/:billingId" element={<BillingDocumentDetail />} />
           <Route path="/object/vendor/:vendorId" element={<VendorDetail />} />
+          <Route path="/object/customer/:customerId" element={<CustomerDetail />} />
         </Routes>
       </FioriShell>
     </BrowserRouter>

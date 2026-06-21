@@ -5,7 +5,7 @@ export default function SalesPage() {
   return (
     <div>
       {SALES_SECTIONS.map((section) => (
-        <TileSection key={section.title} section={section} />
+        <TileSection key={section.title.vi} section={section} />
       ))}
     </div>
   );

@@ -5,7 +5,7 @@ export default function ManufacturingPage() {
   return (
     <div>
       {MANUFACTURING_SECTIONS.map((section) => (
-        <TileSection key={section.title} section={section} />
+        <TileSection key={section.title.vi} section={section} />
       ))}
     </div>
   );

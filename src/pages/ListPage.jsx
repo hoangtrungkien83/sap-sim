@@ -3,20 +3,23 @@ import { useSapStore } from '../store/sapStore';
 import DataTable from '../components/DataTable';
 import StatusBadge from '../components/StatusBadge';
 import Breadcrumb from '../components/Breadcrumb';
+import { useT } from '../hooks/useT';
+import { getMaterialName } from '../data/masterData';
 
-// listKey -> { breadcrumb module, object detail route prefix }
+// listKey -> { breadcrumb module key, object detail route prefix }
 const LIST_META = {
-  vendors: { module: 'Procurement', modulePath: '/procurement', objectPath: (row) => `/object/vendor/${row.id}` },
-  invoices: { module: 'Procurement', modulePath: '/procurement', objectPath: (row) => `/object/invoice/${row.id}` },
-  stock: { module: 'Manufacturing and Supply Chain', modulePath: '/manufacturing', objectPath: null },
-  pos: { module: 'Procurement', modulePath: '/procurement', objectPath: (row) => `/object/po/${row.id}` },
-  salesOrders: { module: 'Sales', modulePath: '/sales', objectPath: (row) => `/object/so/${row.id}` },
-  billing: { module: 'Sales', modulePath: '/sales', objectPath: (row) => `/object/billing/${row.id}` },
+  vendors: { moduleKey: 'nav_procurement', modulePath: '/procurement', objectPath: (row) => `/object/vendor/${row.id}` },
+  invoices: { moduleKey: 'nav_procurement', modulePath: '/procurement', objectPath: (row) => `/object/invoice/${row.id}` },
+  stock: { moduleKey: 'nav_manufacturing', modulePath: '/manufacturing', objectPath: null },
+  pos: { moduleKey: 'nav_procurement', modulePath: '/procurement', objectPath: (row) => `/object/po/${row.id}` },
+  salesOrders: { moduleKey: 'nav_sales', modulePath: '/sales', objectPath: (row) => `/object/so/${row.id}` },
+  billing: { moduleKey: 'nav_sales', modulePath: '/sales', objectPath: (row) => `/object/billing/${row.id}` },
 };
 
 export default function ListPage() {
   const { listKey } = useParams();
   const navigate = useNavigate();
+  const { t, lang } = useT();
   const vendors = useSapStore((s) => s.vendors);
   const supplierInvoices = useSapStore((s) => s.supplierInvoices);
   const stock = useSapStore((s) => s.stock);
@@ -25,96 +28,100 @@ export default function ListPage() {
   const salesOrders = useSapStore((s) => s.salesOrders);
   const billingDocuments = useSapStore((s) => s.billingDocuments);
 
+  const isVi = lang === 'vi';
+
   const configs = {
     vendors: {
-      title: 'Display Supplier List',
+      title: isVi ? 'Danh sách nhà cung cấp' : 'Display Supplier List',
       icon: 'ti-truck',
       columns: [
-        { key: 'id', label: 'Vendor ID', sortable: true },
-        { key: 'name', label: 'Name', sortable: true },
-        { key: 'country', label: 'Country', sortable: true },
-        { key: 'currency', label: 'Currency', sortable: true },
+        { key: 'id', label: isVi ? 'Mã NCC' : 'Vendor ID', sortable: true },
+        { key: 'name', label: isVi ? 'Tên' : 'Name', sortable: true },
+        { key: 'country', label: isVi ? 'Quốc gia' : 'Country', sortable: true },
+        { key: 'currency', label: isVi ? 'Tiền tệ' : 'Currency', sortable: true },
+        { key: 'category', label: isVi ? 'Danh mục' : 'Category', render: (r) => r.category?.[lang] ?? r.category?.vi },
       ],
       rows: vendors,
-      empty: 'Chưa có nhà cung cấp.',
-      searchPlaceholder: 'Tìm theo tên hoặc mã nhà cung cấp...',
+      empty: isVi ? 'Chưa có nhà cung cấp.' : 'No vendors yet.',
+      searchPlaceholder: isVi ? 'Tìm theo tên hoặc mã nhà cung cấp...' : 'Search by vendor name or ID...',
+      searchKeys: ['id', 'name', 'country'],
     },
     invoices: {
-      title: 'Supplier Invoices List',
+      title: isVi ? 'Danh sách hóa đơn nhà cung cấp' : 'Supplier Invoices List',
       icon: 'ti-file-invoice',
       columns: [
-        { key: 'id', label: 'Invoice No.', sortable: true },
-        { key: 'vendorName', label: 'Vendor', sortable: true },
-        { key: 'poId', label: 'PO Reference', sortable: true },
-        { key: 'amount', label: 'Amount', sortable: true, render: (r) => `${r.amount.toLocaleString('vi-VN')} ${r.currency}` },
-        { key: 'status', label: 'Status', render: (r) => <StatusBadge status={r.status} /> },
+        { key: 'id', label: isVi ? 'Số hóa đơn' : 'Invoice No.', sortable: true },
+        { key: 'vendorName', label: isVi ? 'Nhà cung cấp' : 'Vendor', sortable: true },
+        { key: 'poId', label: isVi ? 'Tham chiếu PO' : 'PO Reference', sortable: true },
+        { key: 'amount', label: isVi ? 'Số tiền' : 'Amount', sortable: true, render: (r) => `${r.amount.toLocaleString('vi-VN')} ${r.currency}` },
+        { key: 'status', label: isVi ? 'Trạng thái' : 'Status', render: (r) => <StatusBadge status={r.status} /> },
       ],
       rows: supplierInvoices,
-      empty: 'Chưa có hóa đơn nào được ghi nhận. Hãy dùng MIRO để tạo hóa đơn.',
-      searchPlaceholder: 'Tìm theo số hóa đơn, vendor...',
+      empty: isVi ? 'Chưa có hóa đơn nào được ghi nhận. Hãy dùng MIRO để tạo hóa đơn.' : 'No invoices recorded yet. Use MIRO to create one.',
+      searchPlaceholder: isVi ? 'Tìm theo số hóa đơn, vendor...' : 'Search by invoice no., vendor...',
     },
     stock: {
-      title: 'MB52 — Display Warehouse Stock',
+      title: isVi ? 'MB52 — Hiển thị tồn kho' : 'MB52 — Display Warehouse Stock',
       icon: 'ti-building-warehouse',
       columns: [
-        { key: 'materialId', label: 'Material', sortable: true },
+        { key: 'materialId', label: isVi ? 'Vật tư' : 'Material', sortable: true },
         {
           key: 'materialName',
-          label: 'Description',
-          render: (r) => materials.find((m) => m.id === r.materialId)?.name ?? '—',
+          label: isVi ? 'Diễn giải' : 'Description',
+          render: (r) => getMaterialName(materials.find((m) => m.id === r.materialId), lang) || '—',
         },
         { key: 'plant', label: 'Plant', sortable: true },
-        { key: 'qty', label: 'Quantity', sortable: true, render: (r) => `${r.qty.toLocaleString('vi-VN')} ${r.unit}` },
+        { key: 'qty', label: isVi ? 'Số lượng' : 'Quantity', sortable: true, render: (r) => `${r.qty.toLocaleString('vi-VN')} ${r.unit}` },
       ],
-      rows: stock.map((s) => ({ ...s, materialName: materials.find((m) => m.id === s.materialId)?.name ?? '' })),
-      empty: 'Không có dữ liệu tồn kho.',
-      searchPlaceholder: 'Tìm theo mã vật tư...',
+      rows: stock.map((s) => ({ ...s, materialName: getMaterialName(materials.find((m) => m.id === s.materialId), lang) })),
+      empty: isVi ? 'Không có dữ liệu tồn kho.' : 'No stock data.',
+      searchPlaceholder: isVi ? 'Tìm theo mã vật tư...' : 'Search by material code...',
       searchKeys: ['materialId', 'materialName', 'plant'],
     },
     pos: {
-      title: 'Purchase Order list',
+      title: isVi ? 'Danh sách đơn đặt hàng' : 'Purchase Order list',
       icon: 'ti-clipboard-list',
       columns: [
-        { key: 'id', label: 'PO Number', sortable: true },
-        { key: 'vendorName', label: 'Vendor', sortable: true },
-        { key: 'materialName', label: 'Material', sortable: true },
-        { key: 'quantity', label: 'Quantity', sortable: true, render: (r) => `${r.quantity} ${r.unit}` },
-        { key: 'netValue', label: 'Net Value', sortable: true, render: (r) => `${r.netValue.toLocaleString('vi-VN')} VND` },
-        { key: 'status', label: 'Status', render: (r) => <StatusBadge status={r.status} /> },
+        { key: 'id', label: isVi ? 'Số PO' : 'PO Number', sortable: true },
+        { key: 'vendorName', label: isVi ? 'Nhà cung cấp' : 'Vendor', sortable: true },
+        { key: 'materialName', label: isVi ? 'Vật tư' : 'Material', sortable: true },
+        { key: 'quantity', label: isVi ? 'Số lượng' : 'Quantity', sortable: true, render: (r) => `${r.quantity} ${r.unit}` },
+        { key: 'netValue', label: isVi ? 'Giá trị' : 'Net Value', sortable: true, render: (r) => `${r.netValue.toLocaleString('vi-VN')} VND` },
+        { key: 'status', label: isVi ? 'Trạng thái' : 'Status', render: (r) => <StatusBadge status={r.status} /> },
       ],
       rows: purchaseOrders,
-      empty: 'Chưa có Purchase Order nào. Hãy dùng ME21N để tạo PO.',
-      searchPlaceholder: 'Tìm theo số PO, vendor, vật tư...',
+      empty: isVi ? 'Chưa có Purchase Order nào. Hãy dùng ME21N để tạo PO.' : 'No Purchase Orders yet. Use ME21N to create one.',
+      searchPlaceholder: isVi ? 'Tìm theo số PO, vendor, vật tư...' : 'Search by PO no., vendor, material...',
     },
     salesOrders: {
-      title: 'Sales Order List',
+      title: isVi ? 'Danh sách đơn bán hàng' : 'Sales Order List',
       icon: 'ti-shopping-cart',
       columns: [
-        { key: 'id', label: 'SO Number', sortable: true },
-        { key: 'customerName', label: 'Customer', sortable: true },
-        { key: 'materialName', label: 'Material', sortable: true },
-        { key: 'quantity', label: 'Quantity', sortable: true, render: (r) => `${r.quantity} ${r.unit}` },
-        { key: 'netValue', label: 'Net Value', sortable: true, render: (r) => `${r.netValue.toLocaleString('vi-VN')} VND` },
-        { key: 'status', label: 'Status', render: (r) => <StatusBadge status={r.status} /> },
+        { key: 'id', label: isVi ? 'Số SO' : 'SO Number', sortable: true },
+        { key: 'customerName', label: isVi ? 'Khách hàng' : 'Customer', sortable: true },
+        { key: 'materialName', label: isVi ? 'Vật tư' : 'Material', sortable: true },
+        { key: 'quantity', label: isVi ? 'Số lượng' : 'Quantity', sortable: true, render: (r) => `${r.quantity} ${r.unit}` },
+        { key: 'netValue', label: isVi ? 'Giá trị' : 'Net Value', sortable: true, render: (r) => `${r.netValue.toLocaleString('vi-VN')} VND` },
+        { key: 'status', label: isVi ? 'Trạng thái' : 'Status', render: (r) => <StatusBadge status={r.status} /> },
       ],
       rows: salesOrders,
-      empty: 'Chưa có Sales Order nào. Hãy dùng VA01 để tạo đơn hàng.',
-      searchPlaceholder: 'Tìm theo số SO, khách hàng...',
+      empty: isVi ? 'Chưa có Sales Order nào. Hãy dùng VA01 để tạo đơn hàng.' : 'No Sales Orders yet. Use VA01 to create one.',
+      searchPlaceholder: isVi ? 'Tìm theo số SO, khách hàng...' : 'Search by SO no., customer...',
     },
     billing: {
-      title: 'Billing Documents List',
+      title: isVi ? 'Danh sách hóa đơn bán hàng' : 'Billing Documents List',
       icon: 'ti-receipt-2',
       columns: [
-        { key: 'id', label: 'Billing Doc.', sortable: true },
-        { key: 'soId', label: 'SO Reference', sortable: true },
-        { key: 'customerName', label: 'Customer', sortable: true },
-        { key: 'materialName', label: 'Material', sortable: true },
-        { key: 'netValue', label: 'Net Value', sortable: true, render: (r) => `${r.netValue.toLocaleString('vi-VN')} ${r.currency}` },
-        { key: 'status', label: 'Status', render: (r) => <StatusBadge status={r.status} /> },
+        { key: 'id', label: isVi ? 'Số hóa đơn' : 'Billing Doc.', sortable: true },
+        { key: 'soId', label: isVi ? 'Tham chiếu SO' : 'SO Reference', sortable: true },
+        { key: 'customerName', label: isVi ? 'Khách hàng' : 'Customer', sortable: true },
+        { key: 'materialName', label: isVi ? 'Vật tư' : 'Material', sortable: true },
+        { key: 'netValue', label: isVi ? 'Giá trị' : 'Net Value', sortable: true, render: (r) => `${r.netValue.toLocaleString('vi-VN')} ${r.currency}` },
+        { key: 'status', label: isVi ? 'Trạng thái' : 'Status', render: (r) => <StatusBadge status={r.status} /> },
       ],
       rows: billingDocuments,
-      empty: 'Chưa có hóa đơn bán hàng nào. Hãy dùng VF01 để xuất hóa đơn từ Sales Order đã Confirmed.',
-      searchPlaceholder: 'Tìm theo số hóa đơn, khách hàng...',
+      empty: isVi ? 'Chưa có hóa đơn bán hàng nào. Hãy dùng VF01 để xuất hóa đơn từ Sales Order đã Confirmed.' : 'No billing documents yet. Use VF01 to bill a Confirmed Sales Order.',
+      searchPlaceholder: isVi ? 'Tìm theo số hóa đơn, khách hàng...' : 'Search by billing no., customer...',
     },
   };
 
@@ -122,14 +129,12 @@ export default function ListPage() {
   const meta = LIST_META[listKey];
 
   if (!config) {
-    return <div className="text-sm text-[var(--fiori-text-secondary)]">Danh sách không tồn tại.</div>;
+    return <div className="text-sm text-[var(--fiori-text-secondary)]">{isVi ? 'Danh sách không tồn tại.' : 'List not found.'}</div>;
   }
 
   return (
     <div>
-      {meta && (
-        <Breadcrumb crumbs={[{ label: meta.module, path: meta.modulePath }, { label: config.title }]} />
-      )}
+      {meta && <Breadcrumb crumbs={[{ label: t(meta.moduleKey), path: meta.modulePath }, { label: config.title }]} />}
       <div className="flex items-center gap-2 mb-4">
         <i className={`ti ${config.icon} text-xl text-[var(--fiori-link)]`} aria-hidden="true" />
         <h1 className="text-lg font-medium">{config.title}</h1>

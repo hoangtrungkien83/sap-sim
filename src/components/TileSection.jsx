@@ -1,20 +1,26 @@
 import { useNavigate } from 'react-router-dom';
 import { KpiTile, NavTile, CountTile } from './Tiles';
+import { useT } from '../hooks/useT';
+import { tr } from '../data/launchpadData';
 
 export default function TileSection({ section }) {
   const navigate = useNavigate();
+  const { lang } = useT();
 
   return (
     <section className="mb-8">
-      <h2 className="text-lg font-medium text-[var(--fiori-text-primary)] mb-3">{section.title}</h2>
+      <h2 className="text-lg font-medium text-[var(--fiori-text-primary)] mb-3">{tr(section.title, lang)}</h2>
       <div className="grid grid-cols-[repeat(auto-fill,minmax(190px,1fr))] gap-3">
         {section.tiles.map((tile) => {
+          const title = tr(tile.title, lang);
+          const subtitle = tr(tile.subtitle, lang);
+
           if (tile.type === 'kpi') {
             return (
               <KpiTile
                 key={tile.id}
-                title={tile.title}
-                subtitle={tile.subtitle}
+                title={title}
+                subtitle={subtitle}
                 kpiKey={tile.kpiKey}
                 tone={tile.tone}
               />
@@ -24,9 +30,9 @@ export default function TileSection({ section }) {
             return (
               <CountTile
                 key={tile.id}
-                title={tile.title}
+                title={title}
                 value={tile.value}
-                sub={tile.sub}
+                sub={tr(tile.sub, lang)}
                 icon={tile.icon}
                 onClick={() => navigate(`/app/${tile.app}`)}
               />
@@ -36,8 +42,8 @@ export default function TileSection({ section }) {
             return (
               <NavTile
                 key={tile.id}
-                title={tile.title}
-                subtitle={tile.subtitle}
+                title={title}
+                subtitle={subtitle}
                 icon={tile.icon}
                 onClick={() => navigate(`/app/${tile.app}`)}
               />
@@ -47,7 +53,7 @@ export default function TileSection({ section }) {
             return (
               <NavTile
                 key={tile.id}
-                title={tile.title}
+                title={title}
                 subtitle={tile.txn}
                 icon={tile.icon}
                 onClick={() => navigate(`/transaction/${tile.txn}`)}
@@ -58,15 +64,13 @@ export default function TileSection({ section }) {
             return (
               <NavTile
                 key={tile.id}
-                title={tile.title}
+                title={title}
                 icon={tile.icon}
                 onClick={() => navigate(`/list/${tile.list}`)}
               />
             );
           }
-          return (
-            <NavTile key={tile.id} title={tile.title} subtitle={tile.subtitle} icon={tile.icon} onClick={() => {}} />
-          );
+          return <NavTile key={tile.id} title={title} subtitle={subtitle} icon={tile.icon} onClick={() => {}} />;
         })}
       </div>
     </section>

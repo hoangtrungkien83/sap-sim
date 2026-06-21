@@ -2,9 +2,13 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSapStore } from '../../store/sapStore';
 import Breadcrumb from '../../components/Breadcrumb';
+import { useT } from '../../hooks/useT';
+import { getMaterialName } from '../../data/masterData';
 
 export default function ME21N() {
   const navigate = useNavigate();
+  const { t, lang } = useT();
+  const isVi = lang === 'vi';
   const vendors = useSapStore((s) => s.vendors);
   const materials = useSapStore((s) => s.materials);
   const createPurchaseOrder = useSapStore((s) => s.createPurchaseOrder);
@@ -22,7 +26,7 @@ export default function ME21N() {
     e.preventDefault();
     setError('');
     if (!quantity || Number(quantity) <= 0) {
-      setError('Số lượng phải lớn hơn 0.');
+      setError(isVi ? 'Số lượng phải lớn hơn 0.' : 'Quantity must be greater than 0.');
       return;
     }
     const po = createPurchaseOrder({ vendorId, materialId, quantity });
@@ -31,28 +35,28 @@ export default function ME21N() {
 
   return (
     <div className="max-w-2xl">
-      <Breadcrumb crumbs={[{ label: 'Procurement', path: '/procurement' }, { label: 'ME21N — Create Purchase Order' }]} />
+      <Breadcrumb crumbs={[{ label: t('nav_procurement'), path: '/procurement' }, { label: 'ME21N' }]} />
       <div className="flex items-center gap-2 mb-4">
         <i className="ti ti-clipboard-list text-xl text-[var(--fiori-link)]" aria-hidden="true" />
-        <h1 className="text-lg font-medium">ME21N — Create Purchase Order</h1>
+        <h1 className="text-lg font-medium">{isVi ? 'ME21N — Tạo đơn đặt hàng' : 'ME21N — Create Purchase Order'}</h1>
       </div>
 
       {created ? (
         <div className="bg-white border border-[var(--fiori-tile-border)] rounded-lg p-5">
           <div className="flex items-center gap-2 text-[var(--fiori-success)] mb-3">
             <i className="ti ti-circle-check text-xl" aria-hidden="true" />
-            <span className="font-medium">Đã tạo Purchase Order thành công</span>
+            <span className="font-medium">{isVi ? 'Đã tạo Purchase Order thành công' : 'Purchase Order created successfully'}</span>
           </div>
           <dl className="grid grid-cols-2 gap-y-2 text-sm">
-            <dt className="text-[var(--fiori-text-secondary)]">PO Number</dt>
+            <dt className="text-[var(--fiori-text-secondary)]">{isVi ? 'Số PO' : 'PO Number'}</dt>
             <dd className="font-medium">{created.id}</dd>
-            <dt className="text-[var(--fiori-text-secondary)]">Vendor</dt>
+            <dt className="text-[var(--fiori-text-secondary)]">{isVi ? 'Nhà cung cấp' : 'Vendor'}</dt>
             <dd>{created.vendorName}</dd>
-            <dt className="text-[var(--fiori-text-secondary)]">Material</dt>
+            <dt className="text-[var(--fiori-text-secondary)]">{isVi ? 'Vật tư' : 'Material'}</dt>
             <dd>{created.materialName}</dd>
-            <dt className="text-[var(--fiori-text-secondary)]">Quantity</dt>
+            <dt className="text-[var(--fiori-text-secondary)]">{isVi ? 'Số lượng' : 'Quantity'}</dt>
             <dd>{created.quantity} {created.unit}</dd>
-            <dt className="text-[var(--fiori-text-secondary)]">Net Value</dt>
+            <dt className="text-[var(--fiori-text-secondary)]">{isVi ? 'Giá trị' : 'Net Value'}</dt>
             <dd className="font-medium">{created.netValue.toLocaleString('vi-VN')} VND</dd>
           </dl>
           <div className="flex gap-2 mt-4">
@@ -60,20 +64,20 @@ export default function ME21N() {
               onClick={() => navigate(`/transaction/MIGO?poId=${created.id}`)}
               className="bg-[var(--fiori-link)] text-white text-sm px-3 py-1.5 rounded hover:opacity-90"
             >
-              Tiếp tục: Post Goods Receipt (MIGO)
+              {t('btn_continue')}: {t('btn_post_gr')}
             </button>
             <button
               onClick={() => setCreated(null)}
               className="border border-[var(--fiori-tile-border)] text-sm px-3 py-1.5 rounded hover:bg-gray-50"
             >
-              Tạo PO khác
+              {t('btn_create_another')}
             </button>
           </div>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="bg-white border border-[var(--fiori-tile-border)] rounded-lg p-5 space-y-4">
           <div>
-            <label className="block text-sm text-[var(--fiori-text-secondary)] mb-1">Vendor</label>
+            <label className="block text-sm text-[var(--fiori-text-secondary)] mb-1">{isVi ? 'Nhà cung cấp' : 'Vendor'}</label>
             <select
               value={vendorId}
               onChange={(e) => setVendorId(e.target.value)}
@@ -88,7 +92,7 @@ export default function ME21N() {
           </div>
 
           <div>
-            <label className="block text-sm text-[var(--fiori-text-secondary)] mb-1">Material</label>
+            <label className="block text-sm text-[var(--fiori-text-secondary)] mb-1">{isVi ? 'Vật tư' : 'Material'}</label>
             <select
               value={materialId}
               onChange={(e) => setMaterialId(e.target.value)}
@@ -96,14 +100,16 @@ export default function ME21N() {
             >
               {materials.map((m) => (
                 <option key={m.id} value={m.id}>
-                  {m.id} — {m.name} ({m.price.toLocaleString('vi-VN')} VND/{m.unit})
+                  {m.id} — {getMaterialName(m, lang)} ({m.price.toLocaleString('vi-VN')} VND/{m.unit})
                 </option>
               ))}
             </select>
           </div>
 
           <div>
-            <label className="block text-sm text-[var(--fiori-text-secondary)] mb-1">Quantity ({selectedMaterial?.unit})</label>
+            <label className="block text-sm text-[var(--fiori-text-secondary)] mb-1">
+              {isVi ? 'Số lượng' : 'Quantity'} ({selectedMaterial?.unit})
+            </label>
             <input
               type="number"
               min="1"
@@ -114,7 +120,7 @@ export default function ME21N() {
           </div>
 
           <div className="bg-[var(--fiori-page-bg)] rounded p-3 flex justify-between text-sm">
-            <span className="text-[var(--fiori-text-secondary)]">Net Value</span>
+            <span className="text-[var(--fiori-text-secondary)]">{isVi ? 'Giá trị' : 'Net Value'}</span>
             <span className="font-medium">{netValue.toLocaleString('vi-VN')} VND</span>
           </div>
 
@@ -124,7 +130,7 @@ export default function ME21N() {
             type="submit"
             className="bg-[var(--fiori-link)] text-white text-sm px-4 py-2 rounded hover:opacity-90"
           >
-            Save Purchase Order
+            {t('btn_save')} Purchase Order
           </button>
         </form>
       )}
