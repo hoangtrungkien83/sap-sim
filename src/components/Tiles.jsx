@@ -18,13 +18,18 @@ const toneStroke = {
 
 export function KpiTile({ title, subtitle, kpiKey, tone = 'default', updatedAgo }) {
   const { lang } = useT();
-  // Subscribe trực tiếp vào supplierInvoices/billingDocuments để component
-  // re-render đúng lúc dữ liệu nguồn đổi; getKpis() tính nhẹ (vài phép cộng
-  // trên mảng vài chục phần tử) nên gọi trực tiếp trong render là đủ rẻ,
-  // không cần memo hóa thêm.
+  // QUAN TRỌNG: KHÔNG được gọi s.getKpis() bên trong selector của Zustand.
+  // getKpis() trả về object literal MỚI mỗi lần gọi → Zustand so sánh bằng
+  // reference equality → coi là "đổi" mỗi lần → re-render → gọi lại selector
+  // → lại tạo object mới → vòng lặp vô hạn (React error #185, Maximum update
+  // depth exceeded). Cách đúng: lấy hàm getKpis ra trước (hàm thì ổn định,
+  // không đổi reference), rồi GỌI nó ở ngoài selector, trong thân component.
+  const getKpis = useSapStore((s) => s.getKpis);
+  // Subscribe trực tiếp vào 2 mảng dữ liệu nguồn để component re-render đúng
+  // lúc dữ liệu thật đổi (mảng tham chiếu mới chỉ khi set() thực sự chạy).
   useSapStore((s) => s.supplierInvoices);
   useSapStore((s) => s.billingDocuments);
-  const kpi = useSapStore((s) => s.getKpis())[kpiKey];
+  const kpi = getKpis()[kpiKey];
   if (!kpi) return null;
   const agoText = updatedAgo ?? (lang === 'vi' ? '5 phút trước' : '5m ago');
 

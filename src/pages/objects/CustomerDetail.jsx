@@ -12,8 +12,14 @@ export default function CustomerDetail() {
   const { t, lang } = useT();
   const isVi = lang === 'vi';
   const customer = useSapStore((s) => s.customers.find((c) => c.id === customerId));
-  const salesOrders = useSapStore((s) => s.salesOrders.filter((o) => o.customerId === customerId));
-  const billingDocuments = useSapStore((s) => s.billingDocuments.filter((b) => b.customerId === customerId));
+  // .filter() bên trong selector Zustand tạo array mới mỗi lần gọi → rủi ro
+  // vòng lặp re-render (giống lỗi getKpis ở Tiles.jsx). Subscribe vào mảng
+  // gốc (reference ổn định, chỉ đổi khi set() thật sự chạy) rồi filter ở
+  // ngoài, trong thân component.
+  const allSalesOrders = useSapStore((s) => s.salesOrders);
+  const allBillingDocuments = useSapStore((s) => s.billingDocuments);
+  const salesOrders = allSalesOrders.filter((o) => o.customerId === customerId);
+  const billingDocuments = allBillingDocuments.filter((b) => b.customerId === customerId);
 
   if (!customer) {
     return (

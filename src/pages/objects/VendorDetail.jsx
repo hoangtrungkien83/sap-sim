@@ -12,8 +12,12 @@ export default function VendorDetail() {
   const { t, lang } = useT();
   const isVi = lang === 'vi';
   const vendor = useSapStore((s) => s.vendors.find((v) => v.id === vendorId));
-  const purchaseOrders = useSapStore((s) => s.purchaseOrders.filter((p) => p.vendorId === vendorId));
-  const invoices = useSapStore((s) => s.supplierInvoices.filter((i) => i.vendorId === vendorId));
+  // Subscribe vào mảng gốc rồi filter ngoài selector — tránh tạo array mới
+  // mỗi lần selector chạy (xem chú thích chi tiết trong CustomerDetail.jsx).
+  const allPurchaseOrders = useSapStore((s) => s.purchaseOrders);
+  const allInvoices = useSapStore((s) => s.supplierInvoices);
+  const purchaseOrders = allPurchaseOrders.filter((p) => p.vendorId === vendorId);
+  const invoices = allInvoices.filter((i) => i.vendorId === vendorId);
 
   if (!vendor) {
     return (
