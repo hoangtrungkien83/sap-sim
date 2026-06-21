@@ -43,7 +43,7 @@ export const FINANCE_SECTIONS = [
   {
     title: { vi: 'Báo cáo tài chính', en: 'Financial Reporting' },
     tiles: [
-      { id: 'balance-sheet', title: { vi: 'Bảng cân đối kế toán/Báo cáo KQKD', en: 'Balance Sheet/Income Statement' }, icon: 'ti-report-money', type: 'app', app: 'balance-sheet' },
+      { id: 'balance-sheet', title: { vi: 'Bảng cân đối kế toán/Báo cáo KQKD', en: 'Balance Sheet/Income Statement' }, icon: 'ti-report-money', type: 'module', module: 'balance-sheet' },
       { id: 'gl-line-items', title: { vi: 'Hiển thị bút toán Sổ cái', en: 'Display Line Items in General Ledger' }, icon: 'ti-table', type: 'app', app: 'gl-line-items' },
       { id: 'cost-centers', title: { vi: 'Trung tâm chi phí', en: 'Cost Centers' }, subtitle: { vi: 'Sổ tổng hợp', en: 'Review Booklet' }, icon: 'ti-file-analytics', type: 'app', app: 'cost-centers' },
     ],
@@ -201,26 +201,6 @@ export const STOCK_LIST_TITLE = { vi: 'MB52 — Hiển thị tồn kho', en: 'MB
 // rows giữ dữ liệu thô (số liệu không cần dịch), columns song ngữ.
 // ─────────────────────────────────────────────────────────────
 export const APP_REGISTRY = {
-  'balance-sheet': {
-    title: { vi: 'Bảng cân đối kế toán/Báo cáo KQKD', en: 'Balance Sheet/Income Statement' },
-    icon: 'ti-report-money',
-    description: { vi: 'Báo cáo tài chính tổng hợp theo kỳ kế toán hiện tại.', en: 'Consolidated financial report for the current accounting period.' },
-    kind: 'static-table',
-    columns: [
-      { vi: 'Tài khoản', en: 'Account' },
-      { vi: 'Diễn giải', en: 'Description' },
-      { vi: 'Kỳ hiện tại', en: 'Current Period' },
-      { vi: 'Kỳ trước', en: 'Prior Period' },
-    ],
-    rows: [
-      ['100000', { vi: 'Tiền và tương đương tiền', en: 'Cash and Cash Equivalents' }, '12,450,000,000', '10,820,000,000'],
-      ['120000', { vi: 'Phải thu khách hàng', en: 'Accounts Receivable' }, '270,000,000,000', '255,000,000,000'],
-      ['200000', { vi: 'Hàng tồn kho', en: 'Inventory' }, '84,300,000,000', '79,100,000,000'],
-      ['300000', { vi: 'Phải trả người bán', en: 'Accounts Payable' }, '40,640,000,000', '38,200,000,000'],
-      ['400000', { vi: 'Doanh thu', en: 'Revenue' }, '512,000,000,000', '478,500,000,000'],
-      ['500000', { vi: 'Giá vốn hàng bán', en: 'Cost of Goods Sold' }, '341,000,000,000', '318,900,000,000'],
-    ],
-  },
   'gl-line-items': {
     title: { vi: 'Hiển thị bút toán Sổ cái', en: 'Display Line Items in General Ledger' },
     icon: 'ti-table',
@@ -469,6 +449,7 @@ function tilesToSearchEntries(sections, modulePath, moduleLabel, lang) {
       if (tile.type === 'transaction') path = `/transaction/${tile.txn}`;
       else if (tile.type === 'list') path = `/list/${tile.list}`;
       else if (tile.type === 'app' || tile.type === 'count') path = `/app/${tile.app}`;
+      else if (tile.type === 'module') path = `/module/${tile.module}`;
       entries.push({
         id: `${moduleLabel}-${tile.id}`,
         title: tr(tile.title, lang),

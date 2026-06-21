@@ -49,6 +49,17 @@ export default function TileSection({ section }) {
               />
             );
           }
+          if (tile.type === 'module') {
+            return (
+              <NavTile
+                key={tile.id}
+                title={title}
+                subtitle={subtitle}
+                icon={tile.icon}
+                onClick={() => navigate(`/module/${tile.module}`)}
+              />
+            );
+          }
           if (tile.type === 'transaction') {
             return (
               <NavTile

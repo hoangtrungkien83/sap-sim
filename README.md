@@ -136,6 +136,29 @@ Vendor list...) giờ có:
 5 Object Page đã có: **Purchase Order**, **Sales Order**, **Supplier Invoice**,
 **Billing Document**, **Vendor**.
 
+## Balance Sheet — mô phỏng ACDOCA / Universal Journal (module độc lập)
+
+Tile **Balance Sheet/Income Statement** (Finance > Financial Reporting) giờ là một
+module độc lập tại `src/modules/BalanceSheetModule.jsx` (route `/module/balance-sheet`),
+mô phỏng đúng kiến trúc Universal Journal (ACDOCA) của SAP S/4HANA thay vì bảng tĩnh:
+
+- **Mô hình dữ liệu tập trung**: mỗi bút toán mang đủ chiều FI (G/L account, Company
+  Code), CO (Cost Center/Profit Center), và nguồn gốc nghiệp vụ (FI/MM/SD/CO) trong
+  CÙNG MỘT dòng — đúng triết lý "single source of truth" của ACDOCA thật, có sẵn 16
+  dòng seed (8 bút toán kép) trải nhiều Company Code/Period/Ledger.
+- **Smart Filter Bar**: Company Code, Fiscal Year, Period, Ledger — Balance Sheet tính
+  lại số dư real-time (`useMemo`) mỗi khi đổi filter. Có nút **Export to CSV**.
+- **Drill-down Line Items**: số dư mỗi tài khoản là link click được, mở drawer liệt kê
+  từng dòng ACDOCA cấu thành số dư đó (mô phỏng Fiori app F0712 — Display Line Items).
+- **FB50 Post Journal Entry**: tab riêng để nhập bút toán nhiều dòng (G/L Account,
+  Debit/Credit, Amount, Cost/Profit Center), validate Tổng Nợ = Tổng Có mới cho phép
+  Post. Sau khi Post, bút toán ghi thẳng vào state ACDOCA — Balance Sheet cập nhật
+  ngay lập tức, không cần reload.
+
+Module này dùng `useState` riêng (không phụ thuộc `sapStore` chính của app) — hoàn
+toàn self-contained, có thể copy file `BalanceSheetModule.jsx` sang dự án khác và
+chạy ngay chỉ với React 18 + Tailwind.
+
 ## Mọi tile đều có thể bấm vào
 
 Khác với bản trước (nhiều tile "display-only" bấm không có phản hồi), giờ **toàn bộ tile**

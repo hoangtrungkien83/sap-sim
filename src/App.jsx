@@ -22,8 +22,10 @@ import SupplierInvoiceDetail from './pages/objects/SupplierInvoiceDetail';
 import BillingDocumentDetail from './pages/objects/BillingDocumentDetail';
 import VendorDetail from './pages/objects/VendorDetail';
 import CustomerDetail from './pages/objects/CustomerDetail';
+import BalanceSheetModule from './modules/BalanceSheetModule';
 
 const TRANSACTIONS = { ME21N, MIGO, MIRO, VA01, VF01 };
+const MODULES = { 'balance-sheet': BalanceSheetModule };
 
 function TransactionPage() {
   const { txn } = useParams();
@@ -38,6 +40,16 @@ function TransactionPage() {
 function OtherPage() {
   const lang = useLangStore((s) => s.lang);
   return <PlaceholderPage name={tr(NAV_TABS[6].label, lang)} />;
+}
+
+function ModulePage() {
+  const { moduleKey } = useParams();
+  const lang = useLangStore((s) => s.lang);
+  const Component = MODULES[moduleKey];
+  if (!Component) {
+    return <PlaceholderPage name={lang === 'vi' ? `Module ${moduleKey} chưa hỗ trợ` : `Module ${moduleKey} not supported`} />;
+  }
+  return <Component />;
 }
 
 export default function App() {
@@ -55,6 +67,7 @@ export default function App() {
           <Route path="/transaction/:txn" element={<TransactionPage />} />
           <Route path="/list/:listKey" element={<ListPage />} />
           <Route path="/app/:appKey" element={<AppDetailPage />} />
+          <Route path="/module/:moduleKey" element={<ModulePage />} />
           <Route path="/object/po/:poId" element={<PurchaseOrderDetail />} />
           <Route path="/object/so/:soId" element={<SalesOrderDetail />} />
           <Route path="/object/invoice/:invoiceId" element={<SupplierInvoiceDetail />} />
