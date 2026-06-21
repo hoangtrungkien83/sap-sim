@@ -404,8 +404,32 @@ export const useSapStore = create(
       },
     }),
     {
-      name: 'sap-sim-storage-v2', // đổi key vì shape data đã thay đổi (tránh xung đột với localStorage cũ)
-      version: 2,
+      name: 'sap-sim-storage-v3', // bump version vì thêm partialize + field mới (approval, costPrice...)
+      version: 3,
+      // CHỈ persist dữ liệu thuần (mảng/object), KHÔNG BAO GIỜ persist function.
+      // Đây là nguyên nhân gốc gây "màn hình trắng": nếu function như getKpis,
+      // approvePurchaseOrder bị ghi vào localStorage rồi load lại đè lên store
+      // mới (sau khi thêm field/action mới), state khôi phục sẽ thiếu các hàm
+      // đó → gọi s.getKpis() ra TypeError ngay khi render → React crash toàn bộ.
+      partialize: (state) => ({
+        vendors: state.vendors,
+        customers: state.customers,
+        materials: state.materials,
+        purchaseOrders: state.purchaseOrders,
+        goodsReceipts: state.goodsReceipts,
+        supplierInvoices: state.supplierInvoices,
+        stock: state.stock,
+        salesOrders: state.salesOrders,
+        billingDocuments: state.billingDocuments,
+        financeDocuments: state.financeDocuments,
+      }),
+      // Nếu dữ liệu khôi phục từ bản cũ thiếu field nào đó (vd: billing document
+      // cũ chưa có materialId, PO cũ chưa từng có status 'Pending Approval'),
+      // merge nông với state mặc định để không bao giờ thiếu field gây crash.
+      merge: (persistedState, currentState) => ({
+        ...currentState,
+        ...(persistedState ?? {}),
+      }),
     }
   )
 );
