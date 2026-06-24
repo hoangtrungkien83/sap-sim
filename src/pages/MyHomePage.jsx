@@ -3,14 +3,12 @@ import { PAGE_CARDS, tr } from '../data/launchpadData';
 import { KpiTile, CountTile } from '../components/Tiles';
 import { useSapStore } from '../store/sapStore';
 import { useT } from '../hooks/useT';
+import DashboardSection from '../components/DashboardSection';
+import { DASHBOARD_SECTIONS } from '../data/dashboardData';
 
 const cardColor = {
-  blue: 'bg-blue-600',
-  pink: 'bg-pink-600',
-  orange: 'bg-orange-600',
-  purple: 'bg-purple-700',
-  red: 'bg-red-700',
-  teal: 'bg-teal-600',
+  blue: 'bg-blue-600', pink: 'bg-pink-600', orange: 'bg-orange-600',
+  purple: 'bg-purple-700', red: 'bg-red-700', teal: 'bg-teal-600',
 };
 
 export default function MyHomePage() {
@@ -19,33 +17,29 @@ export default function MyHomePage() {
   const resetStore = useSapStore((s) => s.resetStore);
 
   const today = new Date().toLocaleDateString(lang === 'vi' ? 'vi-VN' : 'en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
   });
 
   const handleReset = () => {
-    if (window.confirm(t('shell_reset_confirm'))) {
-      resetStore();
-    }
+    if (window.confirm(t('shell_reset_confirm'))) resetStore();
   };
 
   return (
     <div>
-      {/* Greeting banner */}
+      {/* ── Dashboard KPI tiles (MỚI) ── */}
+      {(DASHBOARD_SECTIONS.home ?? []).map((sec, i) => (
+        <DashboardSection key={i} section={sec} />
+      ))}
+
+      {/* ── Greeting banner (NGUYÊN XI) ── */}
       <div className="bg-gradient-to-r from-blue-700 to-blue-500 text-white rounded-lg p-5 mb-6 flex items-center justify-between flex-wrap gap-3">
         <div>
           <p className="text-sm text-blue-100">{today}</p>
           <h1 className="text-xl font-medium mt-1">{t('shell_greeting')}</h1>
         </div>
         <div className="flex gap-2 flex-wrap">
-          <button className="bg-white/15 hover:bg-white/25 text-sm px-3 py-1.5 rounded transition-colors">
-            {t('shell_recap')}
-          </button>
-          <button className="bg-white/15 hover:bg-white/25 text-sm px-3 py-1.5 rounded transition-colors">
-            {t('shell_home_settings')}
-          </button>
+          <button className="bg-white/15 hover:bg-white/25 text-sm px-3 py-1.5 rounded transition-colors">{t('shell_recap')}</button>
+          <button className="bg-white/15 hover:bg-white/25 text-sm px-3 py-1.5 rounded transition-colors">{t('shell_home_settings')}</button>
           <button
             onClick={handleReset}
             className="bg-white/15 hover:bg-white/25 text-sm px-3 py-1.5 rounded transition-colors flex items-center gap-1"
@@ -57,7 +51,7 @@ export default function MyHomePage() {
         </div>
       </div>
 
-      {/* Pages cards grid */}
+      {/* ── Pages cards grid (NGUYÊN XI) ── */}
       <section className="mb-8">
         <h2 className="text-lg font-medium text-[var(--fiori-text-primary)] mb-3">{t('shell_pages')}</h2>
         <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-3">
@@ -74,21 +68,19 @@ export default function MyHomePage() {
         </div>
       </section>
 
-      {/* Insights tiles */}
+      {/* ── Insights tiles (NGUYÊN XI) ── */}
       <section>
         <h2 className="text-lg font-medium text-[var(--fiori-text-primary)] mb-3">{t('shell_insights_tiles')} (4)</h2>
         <div className="grid grid-cols-[repeat(auto-fill,minmax(190px,1fr))] gap-3">
           <CountTile
             title={lang === 'vi' ? 'Quản lý bút toán nhà cung cấp' : 'Manage Supplier Line Items'}
-            value=""
-            icon="ti-file-invoice"
+            value="" icon="ti-file-invoice"
             onClick={() => navigate('/list/invoices')}
           />
           <CountTile
             title={lang === 'vi' ? 'Phân tích thanh toán NCC' : 'Supplier Payment Analysis'}
             sub={lang === 'vi' ? 'Thanh toán đang mở' : 'Open Payments'}
-            value={0}
-            icon="ti-cash"
+            value={0} icon="ti-cash"
             onClick={() => navigate('/app/payment-blocks')}
           />
           <KpiTile

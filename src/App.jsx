@@ -1,9 +1,14 @@
 import { BrowserRouter, Routes, Route, useParams } from 'react-router-dom';
-import FioriDashboardShell from './components/FioriDashboardShell';
-import DashboardPage from './pages/DashboardPage';
+import FioriShell from './components/FioriShell';
+import MyHomePage from './pages/MyHomePage';
+import FinancePage from './pages/FinancePage';
+import ProcurementPage from './pages/ProcurementPage';
+import ManufacturingPage from './pages/ManufacturingPage';
+import SalesPage from './pages/SalesPage';
+import ProjectPage from './pages/ProjectPage';
+import PlaceholderPage from './pages/PlaceholderPage';
 import ListPage from './pages/ListPage';
 import AppDetailPage from './pages/AppDetailPage';
-import PlaceholderPage from './pages/PlaceholderPage';
 import { useLangStore } from './store/langStore';
 import { NAV_TABS, tr } from './data/launchpadData';
 import ME21N from './pages/transactions/ME21N';
@@ -26,15 +31,9 @@ function TransactionPage() {
   const { txn } = useParams();
   const lang = useLangStore((s) => s.lang);
   const Component = TRANSACTIONS[txn];
-  if (!Component) return <PlaceholderPage name={lang === 'vi' ? `Giao dịch ${txn} chưa hỗ trợ` : `Transaction ${txn} not supported`} />;
-  return <Component />;
-}
-
-function ModulePage() {
-  const { moduleKey } = useParams();
-  const lang = useLangStore((s) => s.lang);
-  const Component = MODULES[moduleKey];
-  if (!Component) return <PlaceholderPage name={lang === 'vi' ? `Module ${moduleKey} chưa hỗ trợ` : `Module ${moduleKey} not supported`} />;
+  if (!Component) {
+    return <PlaceholderPage name={lang === 'vi' ? `Giao dịch ${txn} chưa hỗ trợ` : `Transaction ${txn} not supported`} />;
+  }
   return <Component />;
 }
 
@@ -43,35 +42,40 @@ function OtherPage() {
   return <PlaceholderPage name={tr(NAV_TABS[6].label, lang)} />;
 }
 
+function ModulePage() {
+  const { moduleKey } = useParams();
+  const lang = useLangStore((s) => s.lang);
+  const Component = MODULES[moduleKey];
+  if (!Component) {
+    return <PlaceholderPage name={lang === 'vi' ? `Module ${moduleKey} chưa hỗ trợ` : `Module ${moduleKey} not supported`} />;
+  }
+  return <Component />;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
-      <FioriDashboardShell>
+      <FioriShell>
         <Routes>
-          {/* ── Dashboard pages — mỗi module render DashboardPage ── */}
-          <Route path="/"              element={<DashboardPage tabKey="home"          />} />
-          <Route path="/finance"       element={<DashboardPage tabKey="finance"       />} />
-          <Route path="/procurement"   element={<DashboardPage tabKey="procurement"   />} />
-          <Route path="/manufacturing" element={<DashboardPage tabKey="manufacturing" />} />
-          <Route path="/sales"         element={<DashboardPage tabKey="sales"         />} />
-          <Route path="/project"       element={<DashboardPage tabKey="project"       />} />
-          <Route path="/other"         element={<OtherPage />} />
-
-          {/* ── Transactions & Lists ── */}
+          <Route path="/" element={<MyHomePage />} />
+          <Route path="/finance" element={<FinancePage />} />
+          <Route path="/procurement" element={<ProcurementPage />} />
+          <Route path="/manufacturing" element={<ManufacturingPage />} />
+          <Route path="/project" element={<ProjectPage />} />
+          <Route path="/sales" element={<SalesPage />} />
+          <Route path="/other" element={<OtherPage />} />
           <Route path="/transaction/:txn" element={<TransactionPage />} />
-          <Route path="/list/:listKey"    element={<ListPage />} />
-          <Route path="/app/:appKey"      element={<AppDetailPage />} />
+          <Route path="/list/:listKey" element={<ListPage />} />
+          <Route path="/app/:appKey" element={<AppDetailPage />} />
           <Route path="/module/:moduleKey" element={<ModulePage />} />
-
-          {/* ── Object Pages ── */}
-          <Route path="/object/po/:poId"             element={<PurchaseOrderDetail />} />
-          <Route path="/object/so/:soId"             element={<SalesOrderDetail />} />
-          <Route path="/object/invoice/:invoiceId"   element={<SupplierInvoiceDetail />} />
-          <Route path="/object/billing/:billingId"   element={<BillingDocumentDetail />} />
-          <Route path="/object/vendor/:vendorId"     element={<VendorDetail />} />
+          <Route path="/object/po/:poId" element={<PurchaseOrderDetail />} />
+          <Route path="/object/so/:soId" element={<SalesOrderDetail />} />
+          <Route path="/object/invoice/:invoiceId" element={<SupplierInvoiceDetail />} />
+          <Route path="/object/billing/:billingId" element={<BillingDocumentDetail />} />
+          <Route path="/object/vendor/:vendorId" element={<VendorDetail />} />
           <Route path="/object/customer/:customerId" element={<CustomerDetail />} />
         </Routes>
-      </FioriDashboardShell>
+      </FioriShell>
     </BrowserRouter>
   );
 }
