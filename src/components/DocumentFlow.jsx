@@ -25,6 +25,14 @@ export default function DocumentFlow({ flow }) {
               <p className="text-xs text-[var(--fiori-text-secondary)]">
                 {doc.id} · {doc.status}
               </p>
+              {/* Hiển thị bút toán kép (Dr/Cr) khi FI Document mang theo
+                  drAccount/crAccount — field bổ sung phục vụ giáo dục,
+                  không phải mọi FI Document đều có (vd seed data cũ). */}
+              {doc.drAccount && doc.crAccount && (
+                <p className="text-xs text-[var(--fiori-text-secondary)] mt-0.5 font-mono">
+                  Dr {doc.drAccount} <br className="sm:hidden" />/ Cr {doc.crAccount}
+                </p>
+              )}
             </div>
             <span className="text-xs text-[var(--fiori-text-secondary)]">
               {new Date(doc.date).toLocaleString('vi-VN')}

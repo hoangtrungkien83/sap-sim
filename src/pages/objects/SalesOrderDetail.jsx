@@ -4,7 +4,9 @@ import ObjectPage, { ObjectSection } from '../../components/ObjectPage';
 import StatusBadge from '../../components/StatusBadge';
 import DocumentFlow from '../../components/DocumentFlow';
 import Breadcrumb from '../../components/Breadcrumb';
+import ConceptPanel from '../../components/ConceptPanel';
 import { useT } from '../../hooks/useT';
+import { CONCEPTS } from '../../data/conceptData';
 
 export default function SalesOrderDetail() {
   const { soId } = useParams();
@@ -51,6 +53,7 @@ export default function SalesOrderDetail() {
           { label: so.id },
         ]}
       />
+      <ConceptPanel concept={CONCEPTS.SO_DETAIL} />
       <ObjectPage
         title={`Sales Order ${so.id}`}
         subtitle={`${so.customerName} · Plant ${so.plant}`}

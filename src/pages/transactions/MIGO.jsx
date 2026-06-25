@@ -2,7 +2,13 @@ import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSapStore } from '../../store/sapStore';
 import Breadcrumb from '../../components/Breadcrumb';
+import ConceptPanel from '../../components/ConceptPanel';
 import { useT } from '../../hooks/useT';
+import { CONCEPTS } from '../../data/conceptData';
+
+// Movement Type 101 = "Goods Receipt for Purchase Order into Warehouse" —
+// đúng mã chuẩn MM thật. Hiển thị để học, KHÔNG ảnh hưởng postGoodsReceipt().
+const GR_MOVEMENT_TYPE = '101 — GR for PO into warehouse';
 
 export default function MIGO() {
   const navigate = useNavigate();
@@ -50,6 +56,7 @@ export default function MIGO() {
           <i className="ti ti-truck-delivery text-xl text-[var(--fiori-link)]" aria-hidden="true" />
           <h1 className="text-lg font-medium">{isVi ? 'MIGO — Ghi nhận phiếu nhập kho' : 'MIGO — Post Goods Receipt'}</h1>
         </div>
+        <ConceptPanel concept={CONCEPTS.MIGO} />
         <div className="bg-white border border-[var(--fiori-tile-border)] rounded-lg p-5 text-sm text-[var(--fiori-text-secondary)]">
           {isVi ? 'Chưa có Purchase Order nào đang mở. Hãy tạo PO trước bằng giao dịch ME21N.' : 'No open Purchase Orders. Create one first using ME21N.'}
           <div className="mt-3">
@@ -73,6 +80,8 @@ export default function MIGO() {
         <h1 className="text-lg font-medium">{isVi ? 'MIGO — Ghi nhận phiếu nhập kho' : 'MIGO — Post Goods Receipt'}</h1>
       </div>
 
+      <ConceptPanel concept={CONCEPTS.MIGO} />
+
       {posted ? (
         <div className="bg-white border border-[var(--fiori-tile-border)] rounded-lg p-5">
           <div className="flex items-center gap-2 text-[var(--fiori-success)] mb-3">
@@ -91,6 +100,14 @@ export default function MIGO() {
             <dt className="text-[var(--fiori-text-secondary)]">{isVi ? 'Plant / Tồn kho' : 'Plant / Stock'}</dt>
             <dd>{posted.plant} {isVi ? '(đã cộng vào MB52)' : '(added to MB52)'}</dd>
           </dl>
+
+          {posted.fiPosting && (
+            <div className="mt-3 bg-[var(--fiori-page-bg)] rounded p-2.5 text-xs font-mono">
+              {posted.fiPosting.lines.map((line, i) => (
+                <div key={i}>{line.dr ? 'Dr' : 'Cr'} {line.account}</div>
+              ))}
+            </div>
+          )}
 
           {posted.autoConfirmedSOs && posted.autoConfirmedSOs.length > 0 && (
             <div className="mt-4 bg-[var(--fiori-page-bg)] border border-[var(--fiori-success)]/30 rounded-lg p-3">
@@ -132,6 +149,13 @@ export default function MIGO() {
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="bg-white border border-[var(--fiori-tile-border)] rounded-lg p-5 space-y-4">
+          <div className="pb-3 border-b border-[var(--fiori-tile-border)]">
+            <label className="block text-xs text-[var(--fiori-text-secondary)] mb-1">
+              {isVi ? 'Loại di chuyển kho (Movement Type)' : 'Movement Type'}
+            </label>
+            <input value={GR_MOVEMENT_TYPE} disabled className="w-full border border-[var(--fiori-tile-border)] rounded px-2 py-1.5 text-xs bg-[var(--fiori-page-bg)] text-[var(--fiori-text-secondary)]" />
+          </div>
+
           <div>
             <label className="block text-sm text-[var(--fiori-text-secondary)] mb-1">Purchase Order</label>
             <select

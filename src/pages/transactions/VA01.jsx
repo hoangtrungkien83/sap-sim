@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { useSapStore } from '../../store/sapStore';
 import Breadcrumb from '../../components/Breadcrumb';
 import StatusBadge from '../../components/StatusBadge';
+import ConceptPanel from '../../components/ConceptPanel';
 import { useT } from '../../hooks/useT';
 import { getMaterialName } from '../../data/masterData';
+import { CONCEPTS } from '../../data/conceptData';
 
 export default function VA01() {
   const navigate = useNavigate();
@@ -49,6 +51,8 @@ export default function VA01() {
         <i className="ti ti-shopping-cart-plus text-xl text-[var(--fiori-link)]" aria-hidden="true" />
         <h1 className="text-lg font-medium">{isVi ? 'VA01 — Tạo đơn bán hàng' : 'VA01 — Create Sales Order'}</h1>
       </div>
+
+      <ConceptPanel concept={CONCEPTS.VA01} />
 
       {created ? (
         <div className="bg-white border border-[var(--fiori-tile-border)] rounded-lg p-5">

@@ -4,7 +4,9 @@ import ObjectPage, { ObjectSection } from '../../components/ObjectPage';
 import StatusBadge from '../../components/StatusBadge';
 import DocumentFlow from '../../components/DocumentFlow';
 import Breadcrumb from '../../components/Breadcrumb';
+import ConceptPanel from '../../components/ConceptPanel';
 import { useT } from '../../hooks/useT';
+import { CONCEPTS } from '../../data/conceptData';
 
 export default function BillingDocumentDetail() {
   const { billingId } = useParams();
@@ -50,6 +52,7 @@ export default function BillingDocumentDetail() {
           { label: billing.id },
         ]}
       />
+      <ConceptPanel concept={CONCEPTS.BILLING_DETAIL} />
       <ObjectPage
         title={`Billing Document ${billing.id}`}
         subtitle={billing.customerName}

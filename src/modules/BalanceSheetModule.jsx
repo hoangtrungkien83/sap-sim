@@ -1,4 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
+import ConceptPanel from '../components/ConceptPanel';
+import { CONCEPTS } from '../data/conceptData';
 
 /**
  * ============================================================================
@@ -655,6 +657,8 @@ export default function BalanceSheetModule() {
           FB50 — Post Journal Entry
         </button>
       </div>
+
+      <ConceptPanel concept={activeTab === 'report' ? CONCEPTS.BALANCE_SHEET : CONCEPTS.FB50} />
 
       {activeTab === 'report' ? (
         <>

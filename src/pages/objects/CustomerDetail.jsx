@@ -4,7 +4,9 @@ import ObjectPage, { ObjectSection } from '../../components/ObjectPage';
 import DataTable from '../../components/DataTable';
 import StatusBadge from '../../components/StatusBadge';
 import Breadcrumb from '../../components/Breadcrumb';
+import ConceptPanel from '../../components/ConceptPanel';
 import { useT } from '../../hooks/useT';
+import { CONCEPTS } from '../../data/conceptData';
 
 export default function CustomerDetail() {
   const { customerId } = useParams();
@@ -41,6 +43,7 @@ export default function CustomerDetail() {
           { label: customer.name },
         ]}
       />
+      <ConceptPanel concept={CONCEPTS.CUSTOMER_DETAIL} />
       <ObjectPage
         title={customer.name}
         subtitle={`${isVi ? 'Khách hàng' : 'Customer'} ${customer.id} · ${customer.country}`}

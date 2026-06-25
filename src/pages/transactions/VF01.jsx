@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSapStore } from '../../store/sapStore';
 import Breadcrumb from '../../components/Breadcrumb';
+import ConceptPanel from '../../components/ConceptPanel';
 import { useT } from '../../hooks/useT';
+import { CONCEPTS } from '../../data/conceptData';
 
 export default function VF01() {
   const navigate = useNavigate();
@@ -48,6 +50,7 @@ export default function VF01() {
           <i className="ti ti-receipt-2 text-xl text-[var(--fiori-link)]" aria-hidden="true" />
           <h1 className="text-lg font-medium">{isVi ? 'VF01 — Tạo hóa đơn bán hàng' : 'VF01 — Create Billing Document'}</h1>
         </div>
+        <ConceptPanel concept={CONCEPTS.VF01} />
         <div className="bg-white border border-[var(--fiori-tile-border)] rounded-lg p-5 text-sm text-[var(--fiori-text-secondary)]">
           {isVi
             ? 'Chưa có Sales Order nào ở trạng thái Confirmed để xuất hóa đơn. Đơn Backorder cần đủ hàng (qua MIGO) hoặc tạo SO mới với đủ tồn kho.'
@@ -73,6 +76,8 @@ export default function VF01() {
         <h1 className="text-lg font-medium">{isVi ? 'VF01 — Tạo hóa đơn bán hàng' : 'VF01 — Create Billing Document'}</h1>
       </div>
 
+      <ConceptPanel concept={CONCEPTS.VF01} />
+
       {posted ? (
         <div className="bg-white border border-[var(--fiori-tile-border)] rounded-lg p-5">
           <div className="flex items-center gap-2 text-[var(--fiori-success)] mb-3">
@@ -96,6 +101,10 @@ export default function VF01() {
               ? 'Bút toán FI (Customer Invoice) đã được tạo tự động — xem trong Finance > Accounts Receivable.'
               : 'An FI document (Customer Invoice) has been auto-generated — see Finance > Accounts Receivable.'}
           </p>
+          <div className="mt-2 bg-[var(--fiori-page-bg)] rounded p-2.5 text-xs font-mono">
+            <div>Dr {CONCEPTS.VF01.sampleEntry[0].account}</div>
+            <div>Cr {CONCEPTS.VF01.sampleEntry[1].account}</div>
+          </div>
           <div className="flex gap-2 mt-4">
             <button
               onClick={() => navigate('/finance')}

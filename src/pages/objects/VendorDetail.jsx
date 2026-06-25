@@ -4,7 +4,9 @@ import ObjectPage, { ObjectSection } from '../../components/ObjectPage';
 import DataTable from '../../components/DataTable';
 import StatusBadge from '../../components/StatusBadge';
 import Breadcrumb from '../../components/Breadcrumb';
+import ConceptPanel from '../../components/ConceptPanel';
 import { useT } from '../../hooks/useT';
+import { CONCEPTS } from '../../data/conceptData';
 
 export default function VendorDetail() {
   const { vendorId } = useParams();
@@ -39,6 +41,7 @@ export default function VendorDetail() {
           { label: vendor.name },
         ]}
       />
+      <ConceptPanel concept={CONCEPTS.VENDOR_DETAIL} />
       <ObjectPage
         title={vendor.name}
         subtitle={`${isVi ? 'Nhà cung cấp' : 'Vendor'} ${vendor.id} · ${vendor.country}`}

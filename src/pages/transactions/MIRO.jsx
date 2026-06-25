@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSapStore } from '../../store/sapStore';
 import Breadcrumb from '../../components/Breadcrumb';
+import ConceptPanel from '../../components/ConceptPanel';
 import { useT } from '../../hooks/useT';
+import { CONCEPTS } from '../../data/conceptData';
 
 export default function MIRO() {
   const navigate = useNavigate();
@@ -62,6 +64,7 @@ export default function MIRO() {
           <i className="ti ti-file-dollar text-xl text-[var(--fiori-link)]" aria-hidden="true" />
           <h1 className="text-lg font-medium">{isVi ? 'MIRO — Tạo hóa đơn nhà cung cấp' : 'MIRO — Create Supplier Invoice'}</h1>
         </div>
+        <ConceptPanel concept={CONCEPTS.MIRO} />
         <div className="bg-white border border-[var(--fiori-tile-border)] rounded-lg p-5 text-sm text-[var(--fiori-text-secondary)]">
           {isVi ? 'Chưa có PO nào đã nhận hàng (Goods Receipt). Cần thực hiện MIGO trước khi xuất hóa đơn.' : 'No PO with Goods Receipt yet. Run MIGO first before invoicing.'}
           <div className="mt-3">
@@ -85,6 +88,8 @@ export default function MIRO() {
         <h1 className="text-lg font-medium">{isVi ? 'MIRO — Tạo hóa đơn nhà cung cấp' : 'MIRO — Create Supplier Invoice'}</h1>
       </div>
 
+      <ConceptPanel concept={CONCEPTS.MIRO} />
+
       {posted ? (
         <div className="bg-white border border-[var(--fiori-tile-border)] rounded-lg p-5">
           <div className="flex items-center gap-2 text-[var(--fiori-success)] mb-3">
@@ -106,6 +111,10 @@ export default function MIRO() {
               ? 'Bút toán FI đã được tạo tự động và sẽ xuất hiện trong Finance > Accounts Payable.'
               : 'An FI document has been auto-generated and will appear under Finance > Accounts Payable.'}
           </p>
+          <div className="mt-2 bg-[var(--fiori-page-bg)] rounded p-2.5 text-xs font-mono">
+            <div>Dr {CONCEPTS.MIRO.sampleEntry[0].account}</div>
+            <div>Cr {CONCEPTS.MIRO.sampleEntry[1].account}</div>
+          </div>
           <div className="flex gap-2 mt-4">
             <button
               onClick={() => navigate('/finance')}

@@ -2,8 +2,15 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSapStore } from '../../store/sapStore';
 import Breadcrumb from '../../components/Breadcrumb';
+import ConceptPanel from '../../components/ConceptPanel';
 import { useT } from '../../hooks/useT';
 import { getMaterialName } from '../../data/masterData';
+import { CONCEPTS } from '../../data/conceptData';
+
+// Document Type chuẩn MM cho PO loại "Standard" — hiển thị để bám sát SAP
+// thật, KHÔNG ảnh hưởng tới logic tạo PO (createPurchaseOrder không nhận
+// field này, store vẫn xử lý như trước).
+const PO_DOC_TYPE = 'NB — Standard PO';
 
 export default function ME21N() {
   const navigate = useNavigate();
@@ -16,6 +23,8 @@ export default function ME21N() {
   const [vendorId, setVendorId] = useState(vendors[0]?.id ?? '');
   const [materialId, setMaterialId] = useState(materials[0]?.id ?? '');
   const [quantity, setQuantity] = useState(10);
+  const [companyCode, setCompanyCode] = useState('1010');
+  const [postingDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [created, setCreated] = useState(null);
   const [error, setError] = useState('');
 
@@ -40,6 +49,8 @@ export default function ME21N() {
         <i className="ti ti-clipboard-list text-xl text-[var(--fiori-link)]" aria-hidden="true" />
         <h1 className="text-lg font-medium">{isVi ? 'ME21N — Tạo đơn đặt hàng' : 'ME21N — Create Purchase Order'}</h1>
       </div>
+
+      <ConceptPanel concept={CONCEPTS.ME21N} />
 
       {created ? (
         <div className="bg-white border border-[var(--fiori-tile-border)] rounded-lg p-5">
@@ -76,6 +87,36 @@ export default function ME21N() {
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="bg-white border border-[var(--fiori-tile-border)] rounded-lg p-5 space-y-4">
+          {/* Header data — Document Type, Company Code, Posting Date: hiển thị
+              đúng cấu trúc PO header thật trong SAP, nhưng chỉ là dữ liệu hiển
+              thị/ghi chú — createPurchaseOrder() không thay đổi và không nhận
+              các field này, giữ nguyên logic nghiệp vụ gốc. */}
+          <div className="grid grid-cols-3 gap-3 pb-3 border-b border-[var(--fiori-tile-border)]">
+            <div>
+              <label className="block text-xs text-[var(--fiori-text-secondary)] mb-1">
+                {isVi ? 'Loại chứng từ' : 'Document Type'}
+              </label>
+              <input value={PO_DOC_TYPE} disabled className="w-full border border-[var(--fiori-tile-border)] rounded px-2 py-1.5 text-xs bg-[var(--fiori-page-bg)] text-[var(--fiori-text-secondary)]" />
+            </div>
+            <div>
+              <label className="block text-xs text-[var(--fiori-text-secondary)] mb-1">Company Code</label>
+              <select
+                value={companyCode}
+                onChange={(e) => setCompanyCode(e.target.value)}
+                className="w-full border border-[var(--fiori-tile-border)] rounded px-2 py-1.5 text-xs"
+              >
+                <option value="1010">1010 — SAP Vietnam (Bắc Ninh)</option>
+                <option value="1020">1020 — SAP Vietnam (Đà Nẵng)</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs text-[var(--fiori-text-secondary)] mb-1">
+                {isVi ? 'Ngày chứng từ' : 'Posting Date'}
+              </label>
+              <input value={postingDate} disabled className="w-full border border-[var(--fiori-tile-border)] rounded px-2 py-1.5 text-xs bg-[var(--fiori-page-bg)] text-[var(--fiori-text-secondary)]" />
+            </div>
+          </div>
+
           <div>
             <label className="block text-sm text-[var(--fiori-text-secondary)] mb-1">{isVi ? 'Nhà cung cấp' : 'Vendor'}</label>
             <select

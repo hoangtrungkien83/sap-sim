@@ -3,8 +3,20 @@ import { useSapStore } from '../store/sapStore';
 import DataTable from '../components/DataTable';
 import StatusBadge from '../components/StatusBadge';
 import Breadcrumb from '../components/Breadcrumb';
+import ConceptPanel from '../components/ConceptPanel';
 import { useT } from '../hooks/useT';
 import { getMaterialName } from '../data/masterData';
+import { CONCEPTS } from '../data/conceptData';
+
+// listKey -> concept key trong conceptData.js (ConceptPanel giáo dục)
+const LIST_CONCEPT_KEY = {
+  vendors: 'LIST_VENDORS',
+  invoices: 'LIST_INVOICES',
+  stock: 'LIST_STOCK',
+  pos: 'LIST_PO',
+  salesOrders: 'LIST_SO',
+  billing: 'LIST_BILLING',
+};
 
 // listKey -> { breadcrumb module key, object detail route prefix }
 const LIST_META = {
@@ -139,6 +151,7 @@ export default function ListPage() {
         <i className={`ti ${config.icon} text-xl text-[var(--fiori-link)]`} aria-hidden="true" />
         <h1 className="text-lg font-medium">{config.title}</h1>
       </div>
+      <ConceptPanel concept={CONCEPTS[LIST_CONCEPT_KEY[listKey]]} />
       <DataTable
         columns={config.columns}
         rows={config.rows}

@@ -4,7 +4,9 @@ import ObjectPage, { ObjectSection } from '../../components/ObjectPage';
 import StatusBadge from '../../components/StatusBadge';
 import DocumentFlow from '../../components/DocumentFlow';
 import Breadcrumb from '../../components/Breadcrumb';
+import ConceptPanel from '../../components/ConceptPanel';
 import { useT } from '../../hooks/useT';
+import { CONCEPTS } from '../../data/conceptData';
 
 export default function PurchaseOrderDetail() {
   const { poId } = useParams();
@@ -73,6 +75,7 @@ export default function PurchaseOrderDetail() {
           { label: po.id },
         ]}
       />
+      <ConceptPanel concept={CONCEPTS.PO_DETAIL} />
       <ObjectPage
         title={`Purchase Order ${po.id}`}
         subtitle={`${po.vendorName} · Plant ${po.plant}`}

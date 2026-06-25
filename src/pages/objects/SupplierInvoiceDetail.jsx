@@ -4,7 +4,9 @@ import ObjectPage, { ObjectSection } from '../../components/ObjectPage';
 import StatusBadge from '../../components/StatusBadge';
 import DocumentFlow from '../../components/DocumentFlow';
 import Breadcrumb from '../../components/Breadcrumb';
+import ConceptPanel from '../../components/ConceptPanel';
 import { useT } from '../../hooks/useT';
+import { CONCEPTS } from '../../data/conceptData';
 
 export default function SupplierInvoiceDetail() {
   const { invoiceId } = useParams();
@@ -50,6 +52,7 @@ export default function SupplierInvoiceDetail() {
           { label: invoice.id },
         ]}
       />
+      <ConceptPanel concept={CONCEPTS.INVOICE_DETAIL} />
       <ObjectPage
         title={`Supplier Invoice ${invoice.id}`}
         subtitle={invoice.vendorName}

@@ -165,7 +165,18 @@ export const useSapStore = create(
             salesOrders: updatedSalesOrders,
           };
         });
-        return { ...gr, autoConfirmedSOs };
+        // fiPosting: chỉ là METADATA mô tả bút toán kép tương ứng MM-FI
+        // integration thật (Dr Inventory / Cr GR/IR Clearing), phục vụ
+        // ConceptPanel/UI giáo dục. KHÔNG ghi vào financeDocuments, KHÔNG
+        // ảnh hưởng store hay Balance Sheet — giữ nguyên hành vi gốc.
+        const fiPosting = {
+          amount: qty * po.netPrice,
+          lines: [
+            { account: '200000 — Hàng tồn kho / Inventory', dr: true },
+            { account: '300010 — GR/IR Clearing Account', dr: false },
+          ],
+        };
+        return { ...gr, autoConfirmedSOs, fiPosting };
       },
 
       // ── MIRO: Post Supplier Invoice (Invoice Verification) ──
@@ -196,6 +207,12 @@ export const useSapStore = create(
             vendorName: po.vendorName,
             amount: value,
             postedAt: new Date().toISOString(),
+            // Bút toán kép thật của MIRO: Dr GR/IR Clearing (đóng tạm ứng
+            // GR/IR mở từ MIGO) / Cr Accounts Payable (mở nghĩa vụ phải trả
+            // thật). Field mô tả thêm cho mục đích giáo dục — không phải
+            // điều kiện logic ở đâu khác trong store.
+            drAccount: '300010 — GR/IR Clearing Account',
+            crAccount: '300000 — Phải trả người bán / Accounts Payable',
           };
           return {
             purchaseOrders: updatedPOs,
@@ -274,6 +291,11 @@ export const useSapStore = create(
           vendorName: so.customerName,
           amount: so.netValue,
           postedAt: new Date().toISOString(),
+          // Bút toán kép VF01: Dr Accounts Receivable (ghi nhận quyền thu
+          // tiền) / Cr Sales Revenue (ghi nhận doanh thu) — field mô tả
+          // thêm, không ảnh hưởng logic store.
+          drAccount: '120000 — Phải thu khách hàng / Accounts Receivable',
+          crAccount: '400000 — Doanh thu bán hàng / Sales Revenue',
         };
 
         set((state) => ({
@@ -299,7 +321,7 @@ export const useSapStore = create(
           .forEach((inv) => flow.push({ type: 'Supplier Invoice', id: inv.id, status: inv.status, date: inv.postedAt }));
         state.financeDocuments
           .filter((fi) => state.supplierInvoices.some((inv) => inv.poId === poId && inv.id === fi.reference))
-          .forEach((fi) => flow.push({ type: 'FI Document', id: fi.id, status: 'Posted', date: fi.postedAt }));
+          .forEach((fi) => flow.push({ type: 'FI Document', id: fi.id, status: 'Posted', date: fi.postedAt, drAccount: fi.drAccount, crAccount: fi.crAccount }));
         return flow.sort((a, b) => new Date(a.date) - new Date(b.date));
       },
 
@@ -314,7 +336,7 @@ export const useSapStore = create(
           .forEach((b) => flow.push({ type: 'Billing Document', id: b.id, status: b.status, date: b.postedAt }));
         state.financeDocuments
           .filter((fi) => state.billingDocuments.some((b) => b.soId === soId && b.id === fi.reference))
-          .forEach((fi) => flow.push({ type: 'FI Document', id: fi.id, status: 'Posted', date: fi.postedAt }));
+          .forEach((fi) => flow.push({ type: 'FI Document', id: fi.id, status: 'Posted', date: fi.postedAt, drAccount: fi.drAccount, crAccount: fi.crAccount }));
         return flow.sort((a, b) => new Date(a.date) - new Date(b.date));
       },
 
