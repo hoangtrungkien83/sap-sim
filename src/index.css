@@ -35,26 +35,23 @@ body {
   min-height: 100vh;
 }
 
-/* ── Dark Mode ─────────────────────────────────────────────────
-   Toggle bởi FioriShell: class 'fiori-dark' trên <html>.
-   Không cần sửa bất kỳ component nào — chỉ override token ở đây.
-   ────────────────────────────────────────────────────────────── */
+/* Dark Mode — toggle bởi FioriShell, class 'fiori-dark' trên <html> */
 html.fiori-dark {
-  --fiori-shell-bg:        #1C3F77;
-  --fiori-nav-bg:          #1A212D;
-  --fiori-nav-border:      #2e3e55;
-  --fiori-nav-active:      #66B2FF;
-  --fiori-page-bg:         #1A212D;
-  --fiori-tile-bg:         #212B3C;
-  --fiori-tile-border:     #2e3e55;
-  --fiori-text-primary:    #ffffff;
-  --fiori-text-secondary:  #9AAFC8;
-  --fiori-link:            #66B2FF;
-  --fiori-danger:          #FF4D4D;
-  --fiori-success:         #4CAF50;
-  --fiori-warning:         #FF8800;
+  --fiori-shell-bg:       #1C3F77;
+  --fiori-nav-bg:         #1A212D;
+  --fiori-nav-border:     #2e3e55;
+  --fiori-nav-active:     #66B2FF;
+  --fiori-page-bg:        #1A212D;
+  --fiori-tile-bg:        #212B3C;
+  --fiori-tile-border:    #2e3e55;
+  --fiori-text-primary:   #ffffff;
+  --fiori-text-secondary: #9AAFC8;
+  --fiori-link:           #66B2FF;
+  --fiori-danger:         #FF4D4D;
+  --fiori-success:        #4CAF50;
+  --fiori-warning:        #FF8800;
 }
 html.fiori-dark .bg-white { background-color: #212B3C !important; }
-html.fiori-dark input,
-html.fiori-dark select,
-html.fiori-dark textarea  { background-color: #212B3C !important; color: #fff !important; border-color: #2e3e55 !important; }
+html.fiori-dark input, html.fiori-dark select, html.fiori-dark textarea {
+  background-color: #212B3C !important; color: #fff !important; border-color: #2e3e55 !important;
+}
