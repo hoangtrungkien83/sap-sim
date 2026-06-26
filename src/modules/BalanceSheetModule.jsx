@@ -1,5 +1,9 @@
 import { useState, useMemo, useCallback } from 'react';
 import ConceptPanel from '../components/ConceptPanel';
+import FilterBar from '../components/FilterBar';
+import BalanceSheetReport from '../components/BalanceSheetReport';
+import IncomeStatementReport from '../components/IncomeStatementReport';
+import JournalEntriesOverview from '../components/JournalEntriesOverview';
 import { CONCEPTS } from '../data/conceptData';
 
 /**
@@ -634,21 +638,54 @@ export default function BalanceSheetModule() {
         Mô phỏng SAP S/4HANA Universal Journal (ACDOCA) — dữ liệu liên kết real-time giữa FI / CO / MM / SD.
       </p>
 
-      {/* Tabs: Report vs Post Journal Entry */}
-      <div className="flex gap-1 border-b border-[var(--fiori-tile-border)] mb-4">
+      {/* Tabs: 3 tab MỚI (dùng global FilterBar + mockData.js theo spec
+          1010 US/1710 DE) + 2 tab CŨ giữ nguyên (VN/ACDOCA, FB50) để so
+          sánh trực tiếp trước khi quyết định giữ bộ dữ liệu nào. */}
+      <div className="flex gap-1 border-b border-[var(--fiori-tile-border)] mb-4 overflow-x-auto">
+        <button
+          onClick={() => setActiveTab('bs_new')}
+          className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px whitespace-nowrap ${
+            activeTab === 'bs_new'
+              ? 'border-[var(--fiori-link)] text-[var(--fiori-link)]'
+              : 'border-transparent text-[var(--fiori-text-secondary)] hover:text-[var(--fiori-text-primary)]'
+          }`}
+        >
+          Balance Sheet
+        </button>
+        <button
+          onClick={() => setActiveTab('is_new')}
+          className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px whitespace-nowrap ${
+            activeTab === 'is_new'
+              ? 'border-[var(--fiori-link)] text-[var(--fiori-link)]'
+              : 'border-transparent text-[var(--fiori-text-secondary)] hover:text-[var(--fiori-text-primary)]'
+          }`}
+        >
+          Income Statement
+        </button>
+        <button
+          onClick={() => setActiveTab('je_new')}
+          className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px whitespace-nowrap ${
+            activeTab === 'je_new'
+              ? 'border-[var(--fiori-link)] text-[var(--fiori-link)]'
+              : 'border-transparent text-[var(--fiori-text-secondary)] hover:text-[var(--fiori-text-primary)]'
+          }`}
+        >
+          Journal Entries Overview
+        </button>
+        <span className="border-l border-[var(--fiori-tile-border)] my-2" />
         <button
           onClick={() => setActiveTab('report')}
-          className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px ${
+          className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px whitespace-nowrap ${
             activeTab === 'report'
               ? 'border-[var(--fiori-link)] text-[var(--fiori-link)]'
               : 'border-transparent text-[var(--fiori-text-secondary)] hover:text-[var(--fiori-text-primary)]'
           }`}
         >
-          Balance Sheet Report
+          Báo cáo (VN) — Legacy
         </button>
         <button
           onClick={() => setActiveTab('post')}
-          className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px ${
+          className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px whitespace-nowrap ${
             activeTab === 'post'
               ? 'border-[var(--fiori-link)] text-[var(--fiori-link)]'
               : 'border-transparent text-[var(--fiori-text-secondary)] hover:text-[var(--fiori-text-primary)]'
@@ -658,10 +695,19 @@ export default function BalanceSheetModule() {
         </button>
       </div>
 
-      <ConceptPanel concept={activeTab === 'report' ? CONCEPTS.BALANCE_SHEET : CONCEPTS.FB50} />
-
-      {activeTab === 'report' ? (
+      {(activeTab === 'bs_new' || activeTab === 'is_new' || activeTab === 'je_new') && (
         <>
+          <ConceptPanel concept={CONCEPTS.BALANCE_SHEET} />
+          <FilterBar />
+          {activeTab === 'bs_new' && <BalanceSheetReport />}
+          {activeTab === 'is_new' && <IncomeStatementReport />}
+          {activeTab === 'je_new' && <JournalEntriesOverview />}
+        </>
+      )}
+
+      {activeTab === 'report' && (
+        <>
+          <ConceptPanel concept={CONCEPTS.BALANCE_SHEET} />
           <SmartFilterBar filters={filters} onChange={setFilters} />
 
           {/* KPI tổng quan nhanh */}
